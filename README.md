@@ -70,3 +70,7 @@ MIT License — see [LICENSE](LICENSE)
 ## Author
 
 Partacus-SPQR
+
+## Author's Note
+
+Built this because I wanted my goop to transer just like Rust. It is simple and effecient, no more shift clicking!!! :D
