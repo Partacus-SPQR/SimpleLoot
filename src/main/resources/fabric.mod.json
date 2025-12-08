@@ -1,0 +1,39 @@
+{
+    "schemaVersion": 1,
+    "id": "simpleloot",
+    "version": "${version}",
+    "name": "SimpleLoot",
+    "description": "A lightweight mod that allows you to hover-loot items from containers to your inventory, inspired by Rust's hover loot mechanic.",
+    "authors": [
+        "Partacus-SPQR"
+    ],
+    "contact": {
+        "homepage": "https://github.com/Partacus-SPQR/SimpleLoot",
+        "sources": "https://github.com/Partacus-SPQR/SimpleLoot",
+        "issues": "https://github.com/Partacus-SPQR/SimpleLoot/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/simpleloot/icon.png",
+    "environment": "client",
+    "entrypoints": {
+        "client": [
+            "com.simpleloot.SimpleLootClient"
+        ],
+        "modmenu": [
+            "com.simpleloot.config.ModMenuIntegration"
+        ]
+    },
+    "mixins": [
+        "simpleloot.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.16.9",
+        "minecraft": "~1.21.10",
+        "java": ">=21",
+        "fabric-api": "*",
+        "cloth-config": ">=20.0.0"
+    },
+    "recommends": {
+        "modmenu": "*"
+    }
+}
