@@ -2,6 +2,15 @@
 
 All notable changes to SimpleLoot will be documented in this file.
 
+## [1.1.1] - 2025-12-10
+
+### Changed
+- Simplified Cloth Config compatibility check for better forward compatibility
+- Removed hardcoded API checks in favor of runtime fallback detection
+- When official Cloth Config updates for 1.21.11, it will work automatically
+
+---
+
 ## [1.1.0] - 2025-12-09
 
 ### Added
