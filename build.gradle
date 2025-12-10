@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11.7'
+    id 'fabric-loom' version '1.14-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -38,7 +38,7 @@ dependencies {
     }
 
     // ModMenu API for settings integration
-    modImplementation "com.terraformersmc:modmenu:13.0.0-beta.1"
+    modImplementation "com.terraformersmc:modmenu:17.0.0-alpha.1"
 }
 
 processResources {

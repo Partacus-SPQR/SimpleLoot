@@ -2,6 +2,7 @@ package com.simpleloot;
 
 import com.simpleloot.config.ModConfigScreen;
 import com.simpleloot.config.SimpleLootConfig;
+import com.simpleloot.config.SimpleLootConfigScreen;
 import com.simpleloot.loot.HoverLootHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -34,6 +35,7 @@ public class SimpleLootClient implements ClientModInitializer {
     public static KeyBinding hoverLootKeyBinding;  // Hold to hover loot
     public static KeyBinding toggleKeyBinding;     // Enable/disable the mod
     public static KeyBinding configKeyBinding;     // Open config screen
+    public static KeyBinding reloadConfigKeyBinding; // Reload config from file
 
     @Override
     public void onInitializeClient() {
@@ -68,6 +70,14 @@ public class SimpleLootClient implements ClientModInitializer {
                 KEYBIND_CATEGORY
         ));
 
+        // Reload config from file
+        reloadConfigKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.simpleloot.reload_config",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_UNKNOWN,
+                KEYBIND_CATEGORY
+        ));
+
         // Register tick event for keybinding handling
         ClientTickEvents.END_CLIENT_TICK.register(this::handleKeybinds);
 
@@ -93,8 +103,32 @@ public class SimpleLootClient implements ClientModInitializer {
         // Handle config keybind (only when no screen is open)
         while (configKeyBinding.wasPressed()) {
             if (client.currentScreen == null) {
-                client.setScreen(ModConfigScreen.createConfigScreen(null));
+                client.setScreen(createConfigScreen());
             }
+        }
+        
+        // Handle reload config keybind
+        while (reloadConfigKeyBinding.wasPressed()) {
+            SimpleLootConfig.reload();
+            LOGGER.info("SimpleLoot config reloaded from file");
+            if (client.player != null) {
+                client.player.sendMessage(
+                    net.minecraft.text.Text.literal("SimpleLoot config reloaded"),
+                    true
+                );
+            }
+        }
+    }
+    
+    /**
+     * Creates the config screen, trying Cloth Config first with fallback.
+     */
+    private static net.minecraft.client.gui.screen.Screen createConfigScreen() {
+        try {
+            return ModConfigScreen.createConfigScreen(null);
+        } catch (Throwable e) {
+            LOGGER.warn("Cloth Config unavailable, using fallback config screen");
+            return new SimpleLootConfigScreen(null);
         }
     }
     

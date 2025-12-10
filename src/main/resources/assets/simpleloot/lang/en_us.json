@@ -5,8 +5,11 @@
     "key.simpleloot.hover_loot": "Hover Loot (Hold)",
     "key.simpleloot.toggle": "Enable/Disable SimpleLoot",
     "key.simpleloot.config": "Open Config Screen",
+    "key.simpleloot.reload_config": "Reload Config File",
     
     "config.simpleloot.title": "SimpleLoot Configuration",
+    "config.simpleloot.save": "Save",
+    "config.simpleloot.cancel": "Cancel",
     
     "config.simpleloot.category.general": "General Settings",
     "config.simpleloot.category.containers": "Container Settings",
@@ -15,21 +18,21 @@
     "config.simpleloot.enabled": "Enable SimpleLoot",
     "config.simpleloot.enabled.tooltip": "Enable or disable the hover loot functionality",
     
-    "config.simpleloot.hotbar_protection": "Hotbar Protection",
-    "config.simpleloot.hotbar_protection.tooltip": "Prevent items in your hotbar (slots 1-9) from being transferred to containers",
+    "config.simpleloot.debugMode": "Debug Mode",
+    "config.simpleloot.debugMode.tooltip": "Enable debug logging to the game log for troubleshooting",
     
-    "config.simpleloot.transfer_delay": "Transfer Delay (ms)",
-    "config.simpleloot.transfer_delay.tooltip": "Delay between item transfers in milliseconds. 0 = instant transfer. Higher values give a more visual 'one by one' effect.",
+    "config.simpleloot.hotbarProtection": "Hotbar Protection",
+    "config.simpleloot.hotbarProtection.tooltip": "Prevent items in your hotbar (slots 1-9) from being transferred to containers",
     
-    "config.simpleloot.debug_mode": "Debug Mode",
-    "config.simpleloot.debug_mode.tooltip": "Enable debug logging to the game log for troubleshooting",
+    "config.simpleloot.transferDelayMs": "Transfer Delay (ms)",
+    "config.simpleloot.transferDelayMs.tooltip": "Delay between item transfers in milliseconds. 0 = instant transfer.",
     
-    "config.simpleloot.allow_chests": "Allow Chests",
-    "config.simpleloot.allow_double_chests": "Allow Double Chests",
-    "config.simpleloot.allow_barrels": "Allow Barrels",
-    "config.simpleloot.allow_shulkers": "Allow Shulker Boxes",
-    "config.simpleloot.allow_ender_chests": "Allow Ender Chests",
-    "config.simpleloot.allow_dispensers": "Allow Dispensers",
-    "config.simpleloot.allow_droppers": "Allow Droppers",
-    "config.simpleloot.allow_hoppers": "Allow Hoppers"
+    "config.simpleloot.allowChests": "Allow Chests",
+    "config.simpleloot.allowDoubleChests": "Allow Double Chests",
+    "config.simpleloot.allowBarrels": "Allow Barrels",
+    "config.simpleloot.allowShulkerBoxes": "Allow Shulker Boxes",
+    "config.simpleloot.allowEnderChests": "Allow Ender Chests",
+    "config.simpleloot.allowDispensers": "Allow Dispensers",
+    "config.simpleloot.allowDroppers": "Allow Droppers",
+    "config.simpleloot.allowHoppers": "Allow Hoppers"
 }
