@@ -57,26 +57,13 @@ public class ModMenuIntegration implements ModMenuApi {
             // Try to load a Cloth Config class that would fail if incompatible
             Class.forName("me.shedaniel.clothconfig2.api.ConfigBuilder");
             
-            // Try to detect the specific incompatibility with renderWidget being final
-            // by checking if PressableWidget.renderWidget is final
-            java.lang.reflect.Method renderWidget = net.minecraft.client.gui.widget.PressableWidget.class
-                .getDeclaredMethod("renderWidget", net.minecraft.client.gui.DrawContext.class, int.class, int.class, float.class);
-            
-            if (java.lang.reflect.Modifier.isFinal(renderWidget.getModifiers())) {
-                SimpleLootClient.LOGGER.warn("Detected incompatible Minecraft version: PressableWidget.renderWidget is final");
-                SimpleLootClient.LOGGER.warn("Cloth Config 20.0.149 is not compatible with this Minecraft version");
-                return false;
-            }
-            
-            SimpleLootClient.LOGGER.debug("Cloth Config compatibility check passed");
+            // Cloth Config is present - assume compatible
+            // Runtime errors will be caught in createConfigScreen if it fails
+            SimpleLootClient.LOGGER.debug("Cloth Config found, assuming compatible");
             return true;
         } catch (ClassNotFoundException e) {
             SimpleLootClient.LOGGER.debug("Cloth Config not found: {}", e.getMessage());
             return false;
-        } catch (NoSuchMethodException e) {
-            // Method signature changed - Cloth Config might still work
-            SimpleLootClient.LOGGER.debug("Could not find renderWidget method for compatibility check, assuming compatible");
-            return true;
         } catch (Throwable e) {
             SimpleLootClient.LOGGER.warn("Error checking Cloth Config compatibility: {}", e.getMessage());
             return false;
