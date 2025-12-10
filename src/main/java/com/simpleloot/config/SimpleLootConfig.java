@@ -22,7 +22,7 @@ public class SimpleLootConfig {
     // General Settings
     public boolean enabled = true;
     public boolean debugMode = false; // Enable debug logging for troubleshooting
-    public boolean hotbarProtection = true; // Protect hotbar slots from being transferred
+    public boolean hotbarProtection = false; // Protect hotbar slots from being transferred
     
     // Transfer Settings
     public int transferDelayMs = 0; // Delay between transfers in milliseconds (0 = instant)

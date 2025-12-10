@@ -1,14 +1,15 @@
-# SimpleLoot
+﻿# SimpleLoot
 
-A lightweight Fabric mod for Minecraft 1.21.10 that adds **Rust-style Hover Loot** — quickly transfer items by holding a key and swiping your mouse over slots.
+A lightweight Fabric mod for Minecraft 1.21.11 that adds **Rust-style Hover Loot** - quickly transfer items by holding a key and swiping your mouse over slots.
 
 ## Features
 
-- **Hover Loot** — Hold a key and swipe over items to transfer them instantly
-- **Bidirectional** — Works both ways: container → inventory and inventory → container
-- **Hotbar Protection** — Optionally prevent hotbar items from being transferred
-- **Container Filters** — Enable/disable specific container types
-- **No Default Keybinds** — You choose your preferred keys
+- **Hover Loot** - Hold a key and swipe over items to transfer them instantly
+- **Bidirectional** - Works both ways: container to inventory and inventory to container
+- **Hotbar Protection** - Optionally prevent hotbar items from being transferred
+- **Container Filters** - Enable/disable specific container types
+- **No Default Keybinds** - You choose your preferred keys
+- **Fallback Config** - Built-in config screen works even without Cloth Config
 
 ## Supported Containers
 
@@ -16,7 +17,7 @@ Chests, Double Chests, Barrels, Shulker Boxes, Ender Chests, Dispensers, Dropper
 
 ## Usage
 
-1. Open **Options → Controls → Key Binds → SimpleLoot**
+1. Open **Options > Controls > Key Binds > SimpleLoot**
 2. Bind a key to **Hover Loot (Hold)**
 3. Open any container, hold your key, and swipe over items
 
@@ -27,7 +28,7 @@ Access via **ModMenu** or edit `config/simpleloot.json`
 | Setting | Description | Default |
 |---------|-------------|---------|
 | Enabled | Enable/disable the mod | `true` |
-| Hotbar Protection | Protect hotbar slots | `true` |
+| Hotbar Protection | Protect hotbar slots | `false` |
 | Transfer Delay | Delay between transfers (ms) | `0` |
 | Debug Mode | Enable debug logging | `false` |
 | Container Types | Per-container enable/disable | All enabled |
@@ -42,17 +43,23 @@ Access via **ModMenu** or edit `config/simpleloot.json`
 
 ## Requirements
 
-- Minecraft 1.21.10
-- Fabric Loader 0.16.9+
-- Fabric API
-- Cloth Config 20.0.0+
-- ModMenu (recommended)
+- Minecraft 1.21.11
+- Fabric Loader 0.18.2+
+- Fabric API 0.139.4+
+
+### Optional (Recommended)
+
+- [Cloth Config](https://modrinth.com/mod/cloth-config) - Enhanced config screen
+- [ModMenu](https://modrinth.com/mod/modmenu) - In-game mod configuration access
+
+> **Note:** SimpleLoot includes a built-in fallback config screen that works without Cloth Config. If Cloth Config is installed but incompatible with your Minecraft version, the fallback will be used automatically.
 
 ## Installation
 
 1. Install [Fabric Loader](https://fabricmc.net/use/installer/)
-2. Install [Fabric API](https://modrinth.com/mod/fabric-api) and [Cloth Config](https://modrinth.com/mod/cloth-config)
-3. Drop SimpleLoot into your `mods` folder
+2. Install [Fabric API](https://modrinth.com/mod/fabric-api)
+3. (Optional) Install [Cloth Config](https://modrinth.com/mod/cloth-config) and [ModMenu](https://modrinth.com/mod/modmenu)
+4. Drop SimpleLoot into your `mods` folder
 
 ## Building
 
@@ -64,8 +71,7 @@ cd SimpleLoot
 
 ## License
 
-MIT License — see [LICENSE](LICENSE)
-
+MIT License - see [LICENSE](LICENSE)
 
 ## Author
 
@@ -73,4 +79,4 @@ Partacus-SPQR
 
 ## Author's Note
 
-Built this because I wanted my goop to transer just like Rust. It is simple and effecient, no more shift clicking!!! :D
+Built this because I wanted my loot to transfer just like Rust. Simple and efficient - no more shift clicking!
