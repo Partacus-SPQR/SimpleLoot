@@ -46,6 +46,9 @@ public class SimpleLootConfigScreen extends Screen {
     private record WidgetEntry(ClickableWidget widget, int originalY) {}
     private final List<WidgetEntry> scrollableWidgets = new ArrayList<>();
     
+    // Track footer buttons (non-scrollable)
+    private final List<ClickableWidget> footerButtons = new ArrayList<>();
+    
     // Store current values (we modify these, then save on Done)
     private boolean enabled;
     private boolean debugMode;
@@ -88,6 +91,7 @@ public class SimpleLootConfigScreen extends Screen {
         super.init();
         tooltips.clear();
         scrollableWidgets.clear();
+        footerButtons.clear();
         
         int centerX = this.width / 2;
         int totalWidth = WIDGET_WIDTH + SPACING + RESET_BTN_WIDTH;
@@ -177,22 +181,28 @@ public class SimpleLootConfigScreen extends Screen {
         int totalBottomWidth = bottomButtonWidth * 3 + 8;
         int bottomStartX = this.width / 2 - totalBottomWidth / 2;
         
-        // Keybinds button
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("controls.keybinds"), button -> {
-            this.client.setScreen(new KeybindsScreen(this, this.client.options));
-        }).dimensions(bottomStartX, bottomY, bottomButtonWidth, 20).build());
-        
-        // Done button
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.done"), button -> {
+        // Save & Close button
+        ButtonWidget saveBtn = ButtonWidget.builder(Text.literal("Save & Close"), button -> {
             transferDelayMs = transferDelaySlider.getIntValue();
             saveConfig();
             this.client.setScreen(parent);
-        }).dimensions(bottomStartX + bottomButtonWidth + 4, bottomY, bottomButtonWidth, 20).build());
+        }).dimensions(bottomStartX, bottomY, bottomButtonWidth, 20).build();
+        this.addDrawableChild(saveBtn);
+        footerButtons.add(saveBtn);
+        
+        // Keybinds button
+        ButtonWidget keybindsBtn = ButtonWidget.builder(Text.translatable("controls.keybinds"), button -> {
+            this.client.setScreen(new KeybindsScreen(this, this.client.options));
+        }).dimensions(bottomStartX + bottomButtonWidth + 4, bottomY, bottomButtonWidth, 20).build();
+        this.addDrawableChild(keybindsBtn);
+        footerButtons.add(keybindsBtn);
         
         // Cancel button
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.cancel"), button -> {
+        ButtonWidget cancelBtn = ButtonWidget.builder(Text.translatable("gui.cancel"), button -> {
             this.client.setScreen(parent);
-        }).dimensions(bottomStartX + bottomButtonWidth * 2 + 8, bottomY, bottomButtonWidth, 20).build());
+        }).dimensions(bottomStartX + bottomButtonWidth * 2 + 8, bottomY, bottomButtonWidth, 20).build();
+        this.addDrawableChild(cancelBtn);
+        footerButtons.add(cancelBtn);
         
         // Update widget positions based on initial scroll
         updateWidgetPositions();
@@ -395,16 +405,23 @@ public class SimpleLootConfigScreen extends Screen {
         // Title in header area (fixed)
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xFFFFFF);
         
-        // Enable scissor to clip scrollable content
+        // Enable scissor to clip scrollable content ONLY
         int scissorTop = HEADER_HEIGHT;
         int scissorBottom = this.height - FOOTER_HEIGHT;
         context.enableScissor(0, scissorTop, this.width, scissorBottom);
         
-        // Render scrollable widgets
-        super.render(context, mouseX, mouseY, delta);
+        // Render ONLY scrollable widgets (not footer buttons)
+        for (WidgetEntry entry : scrollableWidgets) {
+            entry.widget.render(context, mouseX, mouseY, delta);
+        }
         
         // Disable scissor
         context.disableScissor();
+        
+        // Render footer buttons OUTSIDE scissor (so they're not clipped)
+        for (ClickableWidget button : footerButtons) {
+            button.render(context, mouseX, mouseY, delta);
+        }
         
         // Draw scrollbar if needed
         if (maxScrollOffset > 0) {

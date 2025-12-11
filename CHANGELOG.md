@@ -2,6 +2,27 @@
 
 All notable changes to SimpleLoot will be documented in this file.
 
+## [1.2.0] - 2025-12-11
+
+### Added
+- Sliders for numeric config values in fallback config screen
+- Tooltips for all config options explaining their purpose
+- Reset buttons for every config option to restore defaults
+- Scrollable config screen with interactive scrollbar (click and drag)
+- Scroll indicators showing when more content is available
+- Footer buttons: Save & Close, Key Binds, Cancel
+
+### Changed
+- Fallback config screen now fully matches Cloth Config UX quality
+- Footer buttons are now always visible (fixed at bottom of screen)
+- Improved layout with proper spacing and centered widgets
+
+### Fixed
+- Footer buttons no longer clipped when scrolling
+- Tooltips render correctly above scroll area
+
+---
+
 ## [1.1.1] - 2025-12-10
 
 ### Changed

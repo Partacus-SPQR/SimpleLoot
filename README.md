@@ -9,7 +9,7 @@ A lightweight Fabric mod for Minecraft 1.21.11 that adds **Rust-style Hover Loot
 - **Hotbar Protection** - Optionally prevent hotbar items from being transferred
 - **Container Filters** - Enable/disable specific container types
 - **No Default Keybinds** - You choose your preferred keys
-- **Fallback Config** - Built-in config screen works even without Cloth Config
+- **Fallback Config** - Full-featured config screen works without Cloth Config (sliders, tooltips, reset buttons, scrollable)
 
 ## Supported Containers
 
@@ -52,7 +52,7 @@ Access via **ModMenu** or edit `config/simpleloot.json`
 - [Cloth Config](https://modrinth.com/mod/cloth-config) - Enhanced config screen
 - [ModMenu](https://modrinth.com/mod/modmenu) - In-game mod configuration access
 
-> **Note:** SimpleLoot includes a built-in fallback config screen that works without Cloth Config. If Cloth Config is installed but incompatible with your Minecraft version, the fallback will be used automatically.
+> **Note:** SimpleLoot includes a full-featured fallback config screen with sliders, tooltips, reset buttons, and scrolling. This screen is used when Cloth Config is unavailable or incompatible with your Minecraft version.
 
 ## Installation
 
