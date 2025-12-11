@@ -2,6 +2,13 @@
 
 All notable changes to SimpleLoot will be documented in this file.
 
+## [1.2.1] - 2025-12-11
+
+### Fixed
+- Cloth Config screen now displays proper labels instead of raw translation keys
+
+---
+
 ## [1.2.0] - 2025-12-11
 
 ### Added
