@@ -41,23 +41,23 @@ public class ModConfigScreen {
                 .build());
         
         general.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.hotbar_protection"), config.hotbarProtection)
+                .startBooleanToggle(Text.translatable("config.simpleloot.hotbarProtection"), config.hotbarProtection)
                 .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.simpleloot.hotbar_protection.tooltip"))
+                .setTooltip(Text.translatable("config.simpleloot.hotbarProtection.tooltip"))
                 .setSaveConsumer(value -> config.hotbarProtection = value)
                 .build());
         
         general.addEntry(entryBuilder
-                .startIntSlider(Text.translatable("config.simpleloot.transfer_delay"), config.transferDelayMs, 0, 200)
+                .startIntSlider(Text.translatable("config.simpleloot.transferDelayMs"), config.transferDelayMs, 0, 200)
                 .setDefaultValue(0)
-                .setTooltip(Text.translatable("config.simpleloot.transfer_delay.tooltip"))
+                .setTooltip(Text.translatable("config.simpleloot.transferDelayMs.tooltip"))
                 .setSaveConsumer(value -> config.transferDelayMs = value)
                 .build());
         
         general.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.debug_mode"), config.debugMode)
+                .startBooleanToggle(Text.translatable("config.simpleloot.debugMode"), config.debugMode)
                 .setDefaultValue(false)
-                .setTooltip(Text.translatable("config.simpleloot.debug_mode.tooltip"))
+                .setTooltip(Text.translatable("config.simpleloot.debugMode.tooltip"))
                 .setSaveConsumer(value -> config.debugMode = value)
                 .build());
         
@@ -66,49 +66,49 @@ public class ModConfigScreen {
                 Text.translatable("config.simpleloot.category.containers"));
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allow_chests"), config.allowChests)
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowChests"), config.allowChests)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowChests = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allow_double_chests"), config.allowDoubleChests)
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowDoubleChests"), config.allowDoubleChests)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowDoubleChests = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allow_barrels"), config.allowBarrels)
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowBarrels"), config.allowBarrels)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowBarrels = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allow_shulkers"), config.allowShulkerBoxes)
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowShulkerBoxes"), config.allowShulkerBoxes)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowShulkerBoxes = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allow_ender_chests"), config.allowEnderChests)
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowEnderChests"), config.allowEnderChests)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowEnderChests = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allow_dispensers"), config.allowDispensers)
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowDispensers"), config.allowDispensers)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowDispensers = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allow_droppers"), config.allowDroppers)
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowDroppers"), config.allowDroppers)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowDroppers = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allow_hoppers"), config.allowHoppers)
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowHoppers"), config.allowHoppers)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowHoppers = value)
                 .build());
