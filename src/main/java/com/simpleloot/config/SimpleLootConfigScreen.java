@@ -4,6 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
  * Vanilla-style fallback config screen for SimpleLoot.
  * Used when Cloth Config is unavailable or incompatible.
  * Each button contains both the label and the current value, like vanilla Minecraft settings.
- * Features hover tooltips for each option.
+ * Features hover tooltips for each option and a proper slider for transfer delay.
  */
 public class SimpleLootConfigScreen extends Screen {
     private final Screen parent;
@@ -37,8 +38,8 @@ public class SimpleLootConfigScreen extends Screen {
     private boolean allowDroppers;
     private boolean allowDispensers;
 
-    // Reference to transfer delay button for updates
-    private ButtonWidget transferDelayButton;
+    // Reference to transfer delay slider for reset
+    private TransferDelaySlider transferDelaySlider;
 
     public SimpleLootConfigScreen(Screen parent) {
         super(Text.translatable("config.simpleloot.title"));
@@ -67,7 +68,10 @@ public class SimpleLootConfigScreen extends Screen {
         
         int buttonWidth = 250;
         int buttonHeight = 20;
+        int resetBtnWidth = 40;
+        int widgetWidth = buttonWidth - resetBtnWidth - 4;
         int centerX = this.width / 2 - buttonWidth / 2;
+        int resetX = centerX + widgetWidth + 4;
         int startY = 32;
         int spacing = 22;
         int row = 0;
@@ -75,103 +79,75 @@ public class SimpleLootConfigScreen extends Screen {
         // Enable SimpleLoot
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Enable or disable SimpleLoot completely.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.enabled", () -> enabled, v -> enabled = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.enabled", () -> enabled, v -> enabled = v, true);
         
         // Debug Mode
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Enable debug logging for troubleshooting issues.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.debugMode", () -> debugMode, v -> debugMode = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.debugMode", () -> debugMode, v -> debugMode = v, false);
         
         // Hotbar Protection
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Prevent items in hotbar slots from being transferred.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.hotbarProtection", () -> hotbarProtection, v -> hotbarProtection = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.hotbarProtection", () -> hotbarProtection, v -> hotbarProtection = v, true);
         
-        // Transfer Delay with --/-/+/++ buttons
+        // Transfer Delay Slider
         int delayRowY = startY + spacing * row++;
-        int delayButtonWidth = 130;
-        int pmButtonWidth = 28;
-        int totalDelayWidth = pmButtonWidth * 4 + delayButtonWidth + 8;
-        int delayStartX = this.width / 2 - totalDelayWidth / 2;
-        
-        // Tooltip for entire transfer delay row
-        addTooltip(delayStartX, delayRowY, totalDelayWidth, buttonHeight, 
+        addTooltip(centerX, delayRowY, buttonWidth, buttonHeight, 
             "Delay between item transfers in milliseconds. 0 = instant, 30+ recommended for visual effect.");
         
-        // -- button (subtract 10)
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("--"), button -> {
-            transferDelayMs = Math.max(0, transferDelayMs - 10);
-            transferDelayButton.setMessage(getTransferDelayText());
-        }).dimensions(delayStartX, delayRowY, pmButtonWidth, buttonHeight).build());
+        transferDelaySlider = new TransferDelaySlider(centerX, delayRowY, widgetWidth, buttonHeight, transferDelayMs);
+        this.addDrawableChild(transferDelaySlider);
         
-        // - button (subtract 1)
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("-"), button -> {
-            transferDelayMs = Math.max(0, transferDelayMs - 1);
-            transferDelayButton.setMessage(getTransferDelayText());
-        }).dimensions(delayStartX + pmButtonWidth + 2, delayRowY, pmButtonWidth, buttonHeight).build());
-        
-        // Main transfer delay display button (click to reset to 0)
-        transferDelayButton = ButtonWidget.builder(getTransferDelayText(), button -> {
-            transferDelayMs = 0;
-            button.setMessage(getTransferDelayText());
-        }).dimensions(delayStartX + pmButtonWidth * 2 + 4, delayRowY, delayButtonWidth, buttonHeight).build();
-        this.addDrawableChild(transferDelayButton);
-        
-        // + button (add 1)
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("+"), button -> {
-            transferDelayMs = Math.min(1000, transferDelayMs + 1);
-            transferDelayButton.setMessage(getTransferDelayText());
-        }).dimensions(delayStartX + pmButtonWidth * 2 + delayButtonWidth + 6, delayRowY, pmButtonWidth, buttonHeight).build());
-        
-        // ++ button (add 10)
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("++"), button -> {
-            transferDelayMs = Math.min(1000, transferDelayMs + 10);
-            transferDelayButton.setMessage(getTransferDelayText());
-        }).dimensions(delayStartX + pmButtonWidth * 3 + delayButtonWidth + 8, delayRowY, pmButtonWidth, buttonHeight).build());
+        // Reset button for slider (resets to 30ms default)
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("↺"), button -> {
+            transferDelaySlider.setValue(30);
+            transferDelayMs = 30;
+        }).dimensions(resetX, delayRowY, resetBtnWidth, buttonHeight).build());
         
         // Container type toggles
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Allow hover-looting from single chests.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.allowChests", () -> allowChests, v -> allowChests = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.allowChests", () -> allowChests, v -> allowChests = v, true);
         
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Allow hover-looting from double (large) chests.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.allowDoubleChests", () -> allowDoubleChests, v -> allowDoubleChests = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.allowDoubleChests", () -> allowDoubleChests, v -> allowDoubleChests = v, true);
         
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Allow hover-looting from barrels.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.allowBarrels", () -> allowBarrels, v -> allowBarrels = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.allowBarrels", () -> allowBarrels, v -> allowBarrels = v, true);
         
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Allow hover-looting from shulker boxes.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.allowShulkerBoxes", () -> allowShulkerBoxes, v -> allowShulkerBoxes = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.allowShulkerBoxes", () -> allowShulkerBoxes, v -> allowShulkerBoxes = v, true);
         
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Allow hover-looting from ender chests.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.allowEnderChests", () -> allowEnderChests, v -> allowEnderChests = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.allowEnderChests", () -> allowEnderChests, v -> allowEnderChests = v, true);
         
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Allow hover-looting from hoppers.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.allowHoppers", () -> allowHoppers, v -> allowHoppers = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.allowHoppers", () -> allowHoppers, v -> allowHoppers = v, true);
         
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Allow hover-looting from droppers.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.allowDroppers", () -> allowDroppers, v -> allowDroppers = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.allowDroppers", () -> allowDroppers, v -> allowDroppers = v, true);
         
         addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
             "Allow hover-looting from dispensers.");
-        addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
-            "config.simpleloot.allowDispensers", () -> allowDispensers, v -> allowDispensers = v);
+        addToggleButtonWithReset(centerX, startY + spacing * row++, widgetWidth, resetX, resetBtnWidth, buttonHeight,
+            "config.simpleloot.allowDispensers", () -> allowDispensers, v -> allowDispensers = v, true);
         
         // Bottom buttons row
         int bottomY = this.height - 28;
@@ -186,6 +162,7 @@ public class SimpleLootConfigScreen extends Screen {
         
         // Done button - saves config
         this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.done"), button -> {
+            transferDelayMs = transferDelaySlider.getIntValue();
             saveConfig();
             this.client.setScreen(parent);
         }).dimensions(bottomStartX + bottomButtonWidth + 4, bottomY, bottomButtonWidth, 20).build());
@@ -200,13 +177,20 @@ public class SimpleLootConfigScreen extends Screen {
         tooltips.add(new TooltipEntry(x, y, width, height, tooltip));
     }
     
-    private void addToggleButton(int x, int y, int width, int height, String translationKey, 
-            java.util.function.Supplier<Boolean> getter, java.util.function.Consumer<Boolean> setter) {
-        this.addDrawableChild(ButtonWidget.builder(getBooleanText(translationKey, getter.get()), button -> {
+    private void addToggleButtonWithReset(int x, int y, int width, int resetX, int resetWidth, int height, 
+            String translationKey, java.util.function.Supplier<Boolean> getter, 
+            java.util.function.Consumer<Boolean> setter, boolean defaultValue) {
+        ButtonWidget toggleBtn = this.addDrawableChild(ButtonWidget.builder(getBooleanText(translationKey, getter.get()), button -> {
             boolean newValue = !getter.get();
             setter.accept(newValue);
             button.setMessage(getBooleanText(translationKey, newValue));
         }).dimensions(x, y, width, height).build());
+        
+        // Reset button
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("↺"), button -> {
+            setter.accept(defaultValue);
+            toggleBtn.setMessage(getBooleanText(translationKey, defaultValue));
+        }).dimensions(resetX, y, resetWidth, height).build());
     }
     
     private Text getBooleanText(String translationKey, boolean value) {
@@ -214,12 +198,6 @@ public class SimpleLootConfigScreen extends Screen {
                 .append(Text.literal(": "))
                 .append(value ? Text.literal("ON").styled(s -> s.withColor(0x55FF55)) 
                               : Text.literal("OFF").styled(s -> s.withColor(0xFF5555)));
-    }
-    
-    private Text getTransferDelayText() {
-        return Text.translatable("config.simpleloot.transferDelayMs")
-                .append(Text.literal(": "))
-                .append(Text.literal(transferDelayMs + " ms").styled(s -> s.withColor(0xFFFF55)));
     }
     
     private void saveConfig() {
@@ -236,6 +214,41 @@ public class SimpleLootConfigScreen extends Screen {
         config.allowDroppers = this.allowDroppers;
         config.allowDispensers = this.allowDispensers;
         config.save();
+    }
+    
+    /**
+     * Custom slider widget for transfer delay (0-500ms range).
+     */
+    private class TransferDelaySlider extends SliderWidget {
+        private static final int MIN = 0;
+        private static final int MAX = 500;
+        
+        public TransferDelaySlider(int x, int y, int width, int height, int initialValue) {
+            super(x, y, width, height, Text.empty(), (double)(initialValue - MIN) / (MAX - MIN));
+            updateMessage();
+        }
+        
+        public int getIntValue() {
+            return (int) Math.round(this.value * (MAX - MIN) + MIN);
+        }
+        
+        public void setValue(int newValue) {
+            this.value = (double)(Math.max(MIN, Math.min(MAX, newValue)) - MIN) / (MAX - MIN);
+            updateMessage();
+        }
+        
+        @Override
+        protected void updateMessage() {
+            int val = getIntValue();
+            setMessage(Text.translatable("config.simpleloot.transferDelayMs")
+                    .append(Text.literal(": "))
+                    .append(Text.literal(val + " ms").styled(s -> s.withColor(0xFFFF55))));
+        }
+        
+        @Override
+        protected void applyValue() {
+            transferDelayMs = getIntValue();
+        }
     }
 
     @Override
