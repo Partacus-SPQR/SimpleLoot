@@ -6,14 +6,22 @@ import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Vanilla-style fallback config screen for SimpleLoot.
  * Used when Cloth Config is unavailable or incompatible.
  * Each button contains both the label and the current value, like vanilla Minecraft settings.
+ * Features hover tooltips for each option.
  */
 public class SimpleLootConfigScreen extends Screen {
     private final Screen parent;
     private final SimpleLootConfig config;
+    
+    // Tooltip system
+    private record TooltipEntry(int x, int y, int width, int height, String tooltip) {}
+    private final List<TooltipEntry> tooltips = new ArrayList<>();
     
     // Store current values (we modify these, then save on Done)
     private boolean enabled;
@@ -28,6 +36,9 @@ public class SimpleLootConfigScreen extends Screen {
     private boolean allowHoppers;
     private boolean allowDroppers;
     private boolean allowDispensers;
+
+    // Reference to transfer delay button for updates
+    private ButtonWidget transferDelayButton;
 
     public SimpleLootConfigScreen(Screen parent) {
         super(Text.translatable("config.simpleloot.title"));
@@ -49,11 +60,11 @@ public class SimpleLootConfigScreen extends Screen {
         this.allowDispensers = config.allowDispensers;
     }
 
-    // Reference to transfer delay button for updates
-    private ButtonWidget transferDelayButton;
-
     @Override
     protected void init() {
+        super.init();
+        tooltips.clear();
+        
         int buttonWidth = 250;
         int buttonHeight = 20;
         int centerX = this.width / 2 - buttonWidth / 2;
@@ -62,14 +73,20 @@ public class SimpleLootConfigScreen extends Screen {
         int row = 0;
         
         // Enable SimpleLoot
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Enable or disable SimpleLoot completely.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.enabled", () -> enabled, v -> enabled = v);
         
         // Debug Mode
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Enable debug logging for troubleshooting issues.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.debugMode", () -> debugMode, v -> debugMode = v);
         
         // Hotbar Protection
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Prevent items in hotbar slots from being transferred.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.hotbarProtection", () -> hotbarProtection, v -> hotbarProtection = v);
         
@@ -77,8 +94,12 @@ public class SimpleLootConfigScreen extends Screen {
         int delayRowY = startY + spacing * row++;
         int delayButtonWidth = 130;
         int pmButtonWidth = 28;
-        int totalDelayWidth = pmButtonWidth * 4 + delayButtonWidth + 8; // 4 small buttons + main + gaps
+        int totalDelayWidth = pmButtonWidth * 4 + delayButtonWidth + 8;
         int delayStartX = this.width / 2 - totalDelayWidth / 2;
+        
+        // Tooltip for entire transfer delay row
+        addTooltip(delayStartX, delayRowY, totalDelayWidth, buttonHeight, 
+            "Delay between item transfers in milliseconds. 0 = instant, 30+ recommended for visual effect.");
         
         // -- button (subtract 10)
         this.addDrawableChild(ButtonWidget.builder(Text.literal("--"), button -> {
@@ -111,42 +132,51 @@ public class SimpleLootConfigScreen extends Screen {
             transferDelayButton.setMessage(getTransferDelayText());
         }).dimensions(delayStartX + pmButtonWidth * 3 + delayButtonWidth + 8, delayRowY, pmButtonWidth, buttonHeight).build());
         
-        // Allow Chests
+        // Container type toggles
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Allow hover-looting from single chests.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.allowChests", () -> allowChests, v -> allowChests = v);
         
-        // Allow Double Chests
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Allow hover-looting from double (large) chests.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.allowDoubleChests", () -> allowDoubleChests, v -> allowDoubleChests = v);
         
-        // Allow Barrels
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Allow hover-looting from barrels.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.allowBarrels", () -> allowBarrels, v -> allowBarrels = v);
         
-        // Allow Shulker Boxes
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Allow hover-looting from shulker boxes.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.allowShulkerBoxes", () -> allowShulkerBoxes, v -> allowShulkerBoxes = v);
         
-        // Allow Ender Chests
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Allow hover-looting from ender chests.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.allowEnderChests", () -> allowEnderChests, v -> allowEnderChests = v);
         
-        // Allow Hoppers
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Allow hover-looting from hoppers.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.allowHoppers", () -> allowHoppers, v -> allowHoppers = v);
         
-        // Allow Droppers
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Allow hover-looting from droppers.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.allowDroppers", () -> allowDroppers, v -> allowDroppers = v);
         
-        // Allow Dispensers
+        addTooltip(centerX, startY + spacing * row, buttonWidth, buttonHeight, 
+            "Allow hover-looting from dispensers.");
         addToggleButton(centerX, startY + spacing * row++, buttonWidth, buttonHeight,
             "config.simpleloot.allowDispensers", () -> allowDispensers, v -> allowDispensers = v);
         
         // Bottom buttons row
         int bottomY = this.height - 28;
         int bottomButtonWidth = 76;
-        int totalBottomWidth = bottomButtonWidth * 3 + 8; // 3 buttons + gaps
+        int totalBottomWidth = bottomButtonWidth * 3 + 8;
         int bottomStartX = this.width / 2 - totalBottomWidth / 2;
         
         // Keybinds button - opens vanilla keybinds screen directly
@@ -164,6 +194,10 @@ public class SimpleLootConfigScreen extends Screen {
         this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.cancel"), button -> {
             this.client.setScreen(parent);
         }).dimensions(bottomStartX + bottomButtonWidth * 2 + 8, bottomY, bottomButtonWidth, 20).build());
+    }
+    
+    private void addTooltip(int x, int y, int width, int height, String tooltip) {
+        tooltips.add(new TooltipEntry(x, y, width, height, tooltip));
     }
     
     private void addToggleButton(int x, int y, int width, int height, String translationKey, 
@@ -206,13 +240,33 @@ public class SimpleLootConfigScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        // Dark background
         context.fill(0, 0, this.width, this.height, 0xC0101010);
+        
+        // Title
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xFFFFFF);
+        
+        // Render widgets
         super.render(context, mouseX, mouseY, delta);
+        
+        // Check for tooltip hover and draw tooltip LAST (on top of everything)
+        for (TooltipEntry entry : tooltips) {
+            if (mouseX >= entry.x && mouseX < entry.x + entry.width &&
+                mouseY >= entry.y && mouseY < entry.y + entry.height) {
+                // Draw tooltip using Minecraft's native method
+                context.drawTooltip(this.textRenderer, Text.literal(entry.tooltip), mouseX, mouseY);
+                break; // Only show one tooltip at a time
+            }
+        }
     }
 
     @Override
     public void close() {
         this.client.setScreen(parent);
+    }
+    
+    @Override
+    public boolean shouldPause() {
+        return false;
     }
 }
