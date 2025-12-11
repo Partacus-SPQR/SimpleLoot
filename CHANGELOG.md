@@ -4,6 +4,9 @@ All notable changes to SimpleLoot will be documented in this file.
 
 ## [1.2.1] - 2025-12-11
 
+### Added
+- Mouse button support for all keybindings (can now bind to mouse buttons in addition to keyboard keys)
+
 ### Fixed
 - Cloth Config screen now displays proper labels instead of raw translation keys
 

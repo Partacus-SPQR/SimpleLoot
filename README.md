@@ -35,6 +35,8 @@ Access via **ModMenu** or edit `config/simpleloot.json`
 
 ## Keybindings
 
+All keybindings support both keyboard keys and mouse buttons.
+
 | Keybind | Description | Default |
 |---------|-------------|---------|
 | Hover Loot (Hold) | Hold to transfer items you hover over | Unbound |
