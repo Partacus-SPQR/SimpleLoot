@@ -1,6 +1,15 @@
 ﻿# SimpleLoot
 
-A lightweight Fabric mod for Minecraft 1.21.11 that adds **Rust-style Hover Loot** - quickly transfer items by holding a key and swiping your mouse over slots.
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.11-green)](https://minecraft.net)
+[![Fabric](https://img.shields.io/badge/Mod%20Loader-Fabric-blue)](https://fabricmc.net)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-1.3.0-orange)](https://modrinth.com/mod/simpleloot)
+
+A lightweight Fabric mod for Minecraft that adds **Rust-style Hover Loot** - quickly transfer items by holding a key and swiping your mouse over slots.
+
+**Author:** Partacus-SPQR  
+**Source:** [GitHub](https://github.com/Partacus-SPQR/SimpleLoot)  
+**Download:** [Modrinth](https://modrinth.com/mod/simpleloot)
 
 ## Features
 
