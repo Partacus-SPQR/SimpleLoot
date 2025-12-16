@@ -43,7 +43,7 @@ A lightweight Fabric mod for Minecraft that adds **Rust-style Hover Loot** - qui
 ### Armor Equip
 - In your inventory, hover over armor pieces to equip them
 - Hover over equipped armor slots to unequip
-- Hover armor in inventory while already wearing same type to instantly swap
+- Hover armor in inventory while wearing armor to swap (e.g., iron chestplate replaces diamond chestplate)
 
 ### Crafting Grid
 - In your inventory or crafting table, hover over items to send a full stack to the crafting grid
