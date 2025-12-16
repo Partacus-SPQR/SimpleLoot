@@ -24,9 +24,11 @@ A lightweight Fabric mod for Minecraft that adds **Rust-style Hover Loot** - qui
 - **No Default Keybinds** - You choose your preferred keys
 - **Fallback Config** - Full-featured config screen works without Cloth Config (sliders, tooltips, reset buttons, scrollable)
 
-## Supported Containers
+## Supported Screens
 
-Chests, Double Chests, Barrels, Shulker Boxes, Ender Chests, Dispensers, Droppers, Hoppers
+**Containers:** Chests, Double Chests, Barrels, Shulker Boxes, Ender Chests, Dispensers, Droppers, Hoppers
+
+**Inventory:** Player inventory slots, Crafting Table (3x3), Survival inventory crafting (2x2)
 
 ## Usage
 
@@ -41,11 +43,12 @@ Chests, Double Chests, Barrels, Shulker Boxes, Ender Chests, Dispensers, Dropper
 ### Armor Equip
 - In your inventory, hover over armor pieces to equip them
 - Hover over equipped armor slots to unequip
+- Hover armor in inventory while already wearing same type to instantly swap
 
 ### Crafting Grid
-- In your inventory or crafting table, hover over items to send them to the crafting grid
+- In your inventory or crafting table, hover over items to send a full stack to the crafting grid
 - Hover over crafting grid slots to move items back to inventory
-- Hover over the crafting output to collect crafted items
+- Hover over the crafting output to craft the maximum amount possible
 
 ## Configuration
 
