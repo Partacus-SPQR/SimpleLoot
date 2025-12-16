@@ -17,6 +17,7 @@ All notable changes to SimpleLoot will be documented in this file.
 - New config option `allowArmorEquip` to enable/disable armor equip via hover loot
 - New config option `armorSwapDelayMs` to control delay between armor swaps (default: 70ms)
 - Creative inventory support for hover drop (survival tab)
+- **Multi-version support**: Now supports Minecraft 1.21.9, 1.21.10, and 1.21.11
 
 ### Fixed
 - Items now transfer as full stacks to crafting grid (was incorrectly splitting stacks)
