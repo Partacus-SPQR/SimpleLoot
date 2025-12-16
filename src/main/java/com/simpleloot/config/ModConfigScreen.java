@@ -42,14 +42,14 @@ public class ModConfigScreen {
         
         general.addEntry(entryBuilder
                 .startBooleanToggle(Text.translatable("config.simpleloot.hotbarProtection"), config.hotbarProtection)
-                .setDefaultValue(true)
+                .setDefaultValue(false)
                 .setTooltip(Text.translatable("config.simpleloot.hotbarProtection.tooltip"))
                 .setSaveConsumer(value -> config.hotbarProtection = value)
                 .build());
         
         general.addEntry(entryBuilder
                 .startIntField(Text.translatable("config.simpleloot.transferDelayMs"), config.transferDelayMs)
-                .setDefaultValue(0)
+                .setDefaultValue(20)
                 .setMin(0)
                 .setMax(500)
                 .setTooltip(Text.translatable("config.simpleloot.transferDelayMs.tooltip"))
@@ -86,7 +86,7 @@ public class ModConfigScreen {
         
         general.addEntry(entryBuilder
                 .startIntField(Text.translatable("config.simpleloot.armorSwapDelayMs"), config.armorSwapDelayMs)
-                .setDefaultValue(100)
+                .setDefaultValue(70)
                 .setMin(0)
                 .setMax(500)
                 .setTooltip(Text.translatable("config.simpleloot.armorSwapDelayMs.tooltip"))

@@ -55,7 +55,7 @@ Access via **ModMenu** or edit `config/simpleloot.json`
 |---------|-------------|---------|
 | Enabled | Enable/disable the mod | `true` |
 | Hotbar Protection | Protect hotbar slots | `false` |
-| Transfer Delay | Delay between transfers (ms) | `0` |
+| Transfer Delay | Delay between transfers (ms) | `20` |
 | Debug Mode | Enable debug logging | `false` |
 | Allow Hover Drop | Enable drop mode (Ctrl+hover) | `true` |
 | Allow Crafting Grid | Enable crafting grid transfers | `true` |
@@ -76,9 +76,9 @@ All keybindings support both keyboard keys and mouse buttons.
 
 ## Requirements
 
-- Minecraft 1.21.11
-- Fabric Loader 0.18.2+
-- Fabric API 0.139.4+
+- Minecraft 1.21.9, 1.21.10, or 1.21.11
+- Fabric Loader 0.16.0+
+- Fabric API
 
 ### Optional (Recommended)
 

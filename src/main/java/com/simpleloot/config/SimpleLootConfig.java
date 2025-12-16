@@ -25,7 +25,7 @@ public class SimpleLootConfig {
     public boolean hotbarProtection = false; // Protect hotbar slots from being transferred
     
     // Transfer Settings
-    public int transferDelayMs = 0; // Delay between transfers in milliseconds (0 = instant)
+    public int transferDelayMs = 20; // Delay between transfers in milliseconds (0 = instant)
     
     // Container Settings
     public boolean allowChests = true;

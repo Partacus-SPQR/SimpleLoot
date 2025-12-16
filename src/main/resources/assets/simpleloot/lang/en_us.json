@@ -17,16 +17,16 @@
     "config.simpleloot.category.keybinds": "Keybindings",
     
     "config.simpleloot.enabled": "Enable SimpleLoot",
-    "config.simpleloot.enabled.tooltip": "Enable or disable the hover loot functionality",
+    "config.simpleloot.enabled.tooltip": "Enable or disable the hover loot functionality. Default: ON",
     
     "config.simpleloot.debugMode": "Debug Mode",
-    "config.simpleloot.debugMode.tooltip": "Enable debug logging to the game log for troubleshooting",
+    "config.simpleloot.debugMode.tooltip": "Enable debug logging to the game log for troubleshooting. Default: OFF",
     
     "config.simpleloot.hotbarProtection": "Hotbar Protection",
-    "config.simpleloot.hotbarProtection.tooltip": "Prevent items in your hotbar (slots 1-9) from being transferred to containers",
+    "config.simpleloot.hotbarProtection.tooltip": "Prevent items in your hotbar (slots 1-9) from being transferred to containers. Default: OFF",
     
     "config.simpleloot.transferDelayMs": "Transfer Delay (ms)",
-    "config.simpleloot.transferDelayMs.tooltip": "Delay between item transfers in milliseconds. 0 = instant transfer.",
+    "config.simpleloot.transferDelayMs.tooltip": "Delay between item transfers in milliseconds. 0 = instant transfer. Default: 20ms",
     
     "config.simpleloot.allowChests": "Allow Chests",
     "config.simpleloot.allowDoubleChests": "Allow Double Chests",
@@ -38,13 +38,13 @@
     "config.simpleloot.allowHoppers": "Allow Hoppers",
     
     "config.simpleloot.allowHoverDrop": "Allow Hover Drop",
-    "config.simpleloot.allowHoverDrop.tooltip": "Enable Ctrl + Hover Loot to drop entire stacks on the ground instead of transferring",
+    "config.simpleloot.allowHoverDrop.tooltip": "Enable Ctrl + Hover Loot to drop entire stacks on the ground instead of transferring. Default: ON",
     
     "config.simpleloot.allowCraftingGrid": "Allow Crafting Grid",
-    "config.simpleloot.allowCraftingGrid.tooltip": "Enable hover loot to send items to/from crafting grids (2x2 in inventory, 3x3 in crafting table)",
+    "config.simpleloot.allowCraftingGrid.tooltip": "Enable hover loot to send items to/from crafting grids (2x2 in inventory, 3x3 in crafting table). Default: ON",
     
     "config.simpleloot.allowArmorEquip": "Allow Armor Equip",
-    "config.simpleloot.allowArmorEquip.tooltip": "Enable hover loot on armor items in inventory to automatically equip/unequip them",
+    "config.simpleloot.allowArmorEquip.tooltip": "Enable hover loot on armor items in inventory to automatically equip/unequip them. Default: ON",
     
     "config.simpleloot.armorSwapDelayMs": "Armor Swap Delay (ms)",
     "config.simpleloot.armorSwapDelayMs.tooltip": "Delay between armor swaps in milliseconds. Lower values = faster swapping but may cause issues. Default: 70ms"

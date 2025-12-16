@@ -134,12 +134,12 @@ public class SimpleLootConfigScreen extends Screen {
         y += ROW_HEIGHT;
         
         // Transfer Delay Slider
-        addTooltip(widgetX, y, totalWidth, 20, "Delay between item transfers in milliseconds. 0 = instant, 30+ recommended. Default: 30ms");
+        addTooltip(widgetX, y, totalWidth, 20, "Delay between item transfers in milliseconds. 0 = instant. Default: 20ms");
         transferDelaySlider = new TransferDelaySlider(widgetX, y, WIDGET_WIDTH, 20, transferDelayMs);
         addScrollableWidget(transferDelaySlider, y);
         ButtonWidget delayReset = ButtonWidget.builder(Text.literal("↺"), button -> {
-            transferDelaySlider.setValue(30);
-            transferDelayMs = 30;
+            transferDelaySlider.setValue(20);
+            transferDelayMs = 20;
         }).dimensions(resetX, y, RESET_BTN_WIDTH, 20).build();
         addScrollableWidget(delayReset, y);
         y += ROW_HEIGHT;

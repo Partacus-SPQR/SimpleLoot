@@ -18,9 +18,16 @@ All notable changes to SimpleLoot will be documented in this file.
 - New config option `armorSwapDelayMs` to control delay between armor swaps (default: 70ms)
 - Creative inventory support for hover drop (survival tab)
 - **Multi-version support**: Now supports Minecraft 1.21.9, 1.21.10, and 1.21.11
+- **Stonecutter build system**: Single codebase builds for multiple Minecraft versions
+
+### Changed
+- Transfer delay default changed from 0ms to 20ms for stability
+- Fabric Loader minimum requirement lowered to 0.16.0 for better compatibility
+- Config tooltips now show default values
 
 ### Fixed
 - Items now transfer as full stacks to crafting grid (was incorrectly splitting stacks)
+- Fixed incorrect default values in Cloth Config screen (hotbarProtection, armorSwapDelayMs)
 
 ---
 
