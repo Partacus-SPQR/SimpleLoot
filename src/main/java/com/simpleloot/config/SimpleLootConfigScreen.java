@@ -54,6 +54,10 @@ public class SimpleLootConfigScreen extends Screen {
     private boolean debugMode;
     private boolean hotbarProtection;
     private int transferDelayMs;
+    private boolean allowHoverDrop;
+    private boolean allowCraftingGrid;
+    private boolean allowArmorEquip;
+    private int armorSwapDelayMs;
     private boolean allowChests;
     private boolean allowDoubleChests;
     private boolean allowBarrels;
@@ -65,6 +69,7 @@ public class SimpleLootConfigScreen extends Screen {
 
     // Reference to transfer delay slider for reset
     private TransferDelaySlider transferDelaySlider;
+    private ArmorSwapDelaySlider armorSwapDelaySlider;
 
     public SimpleLootConfigScreen(Screen parent) {
         super(Text.translatable("config.simpleloot.title"));
@@ -76,6 +81,10 @@ public class SimpleLootConfigScreen extends Screen {
         this.debugMode = config.debugMode;
         this.hotbarProtection = config.hotbarProtection;
         this.transferDelayMs = config.transferDelayMs;
+        this.allowHoverDrop = config.allowHoverDrop;
+        this.allowCraftingGrid = config.allowCraftingGrid;
+        this.allowArmorEquip = config.allowArmorEquip;
+        this.armorSwapDelayMs = config.armorSwapDelayMs;
         this.allowChests = config.allowChests;
         this.allowDoubleChests = config.allowDoubleChests;
         this.allowBarrels = config.allowBarrels;
@@ -99,8 +108,8 @@ public class SimpleLootConfigScreen extends Screen {
         int resetX = widgetX + WIDGET_WIDTH + SPACING;
         int y = HEADER_HEIGHT;
         
-        // Count options for scroll calculation (12 options)
-        int numberOfOptions = 12;
+        // Count options for scroll calculation (16 options now with armor swap delay)
+        int numberOfOptions = 16;
         contentHeight = numberOfOptions * ROW_HEIGHT;
         int contentAreaHeight = this.height - HEADER_HEIGHT - FOOTER_HEIGHT;
         maxScrollOffset = Math.max(0, contentHeight - contentAreaHeight);
@@ -133,6 +142,35 @@ public class SimpleLootConfigScreen extends Screen {
             transferDelayMs = 30;
         }).dimensions(resetX, y, RESET_BTN_WIDTH, 20).build();
         addScrollableWidget(delayReset, y);
+        y += ROW_HEIGHT;
+        
+        // Allow Hover Drop
+        addTooltip(widgetX, y, totalWidth, 20, "Enable Ctrl + Hover Loot to drop entire stacks on the ground. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowHoverDrop", 
+            () -> allowHoverDrop, v -> allowHoverDrop = v, true);
+        y += ROW_HEIGHT;
+        
+        // Allow Crafting Grid
+        addTooltip(widgetX, y, totalWidth, 20, "Enable hover loot to send items to/from crafting grids. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowCraftingGrid", 
+            () -> allowCraftingGrid, v -> allowCraftingGrid = v, true);
+        y += ROW_HEIGHT;
+        
+        // Allow Armor Equip
+        addTooltip(widgetX, y, totalWidth, 20, "Enable hover loot on armor in inventory to equip/unequip. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowArmorEquip", 
+            () -> allowArmorEquip, v -> allowArmorEquip = v, true);
+        y += ROW_HEIGHT;
+        
+        // Armor Swap Delay Slider
+        addTooltip(widgetX, y, totalWidth, 20, "Delay between armor swaps in milliseconds. Lower = faster but may cause issues. Default: 70ms");
+        armorSwapDelaySlider = new ArmorSwapDelaySlider(widgetX, y, WIDGET_WIDTH, 20, armorSwapDelayMs);
+        addScrollableWidget(armorSwapDelaySlider, y);
+        ButtonWidget armorDelayReset = ButtonWidget.builder(Text.literal("↺"), button -> {
+            armorSwapDelaySlider.setValue(70);
+            armorSwapDelayMs = 70;
+        }).dimensions(resetX, y, RESET_BTN_WIDTH, 20).build();
+        addScrollableWidget(armorDelayReset, y);
         y += ROW_HEIGHT;
         
         // Container type toggles
@@ -261,6 +299,10 @@ public class SimpleLootConfigScreen extends Screen {
         config.debugMode = this.debugMode;
         config.hotbarProtection = this.hotbarProtection;
         config.transferDelayMs = this.transferDelayMs;
+        config.allowHoverDrop = this.allowHoverDrop;
+        config.allowCraftingGrid = this.allowCraftingGrid;
+        config.allowArmorEquip = this.allowArmorEquip;
+        config.armorSwapDelayMs = this.armorSwapDelayMs;
         config.allowChests = this.allowChests;
         config.allowDoubleChests = this.allowDoubleChests;
         config.allowBarrels = this.allowBarrels;
@@ -304,6 +346,41 @@ public class SimpleLootConfigScreen extends Screen {
         @Override
         protected void applyValue() {
             transferDelayMs = getIntValue();
+        }
+    }
+    
+    /**
+     * Custom slider widget for armor swap delay (0-500ms range).
+     */
+    private class ArmorSwapDelaySlider extends SliderWidget {
+        private static final int MIN = 0;
+        private static final int MAX = 500;
+        
+        public ArmorSwapDelaySlider(int x, int y, int width, int height, int initialValue) {
+            super(x, y, width, height, Text.empty(), (double)(initialValue - MIN) / (MAX - MIN));
+            updateMessage();
+        }
+        
+        public int getIntValue() {
+            return (int) Math.round(this.value * (MAX - MIN) + MIN);
+        }
+        
+        public void setValue(int newValue) {
+            this.value = (double)(Math.max(MIN, Math.min(MAX, newValue)) - MIN) / (MAX - MIN);
+            updateMessage();
+        }
+        
+        @Override
+        protected void updateMessage() {
+            int val = getIntValue();
+            setMessage(Text.translatable("config.simpleloot.armorSwapDelayMs")
+                    .append(Text.literal(": "))
+                    .append(Text.literal(val + " ms").styled(s -> s.withColor(0xFFFF55))));
+        }
+        
+        @Override
+        protected void applyValue() {
+            armorSwapDelayMs = getIntValue();
         }
     }
     

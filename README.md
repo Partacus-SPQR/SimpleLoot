@@ -5,6 +5,10 @@ A lightweight Fabric mod for Minecraft 1.21.11 that adds **Rust-style Hover Loot
 ## Features
 
 - **Hover Loot** - Hold a key and swipe over items to transfer them instantly
+- **Hover Drop** - Hold Ctrl + hover loot key (or dedicated drop key) to drop items on the ground
+- **Armor Equip** - Hover over armor in your inventory to instantly equip it, or hover armor slots to unequip
+- **Crafting Grid** - Hover over items in your inventory to send them to the 2x2 or 3x3 crafting grid
+- **Creative Support** - Hover drop works in creative mode's survival inventory tab
 - **Bidirectional** - Works both ways: container to inventory and inventory to container
 - **Hotbar Protection** - Optionally prevent hotbar items from being transferred
 - **Container Filters** - Enable/disable specific container types
@@ -21,6 +25,19 @@ Chests, Double Chests, Barrels, Shulker Boxes, Ender Chests, Dispensers, Dropper
 2. Bind a key to **Hover Loot (Hold)**
 3. Open any container, hold your key, and swipe over items
 
+### Drop Mode
+- Hold **Ctrl + Hover Loot key** to drop items instead of transferring
+- Or bind a dedicated **Hover Drop** key
+
+### Armor Equip
+- In your inventory, hover over armor pieces to equip them
+- Hover over equipped armor slots to unequip
+
+### Crafting Grid
+- In your inventory or crafting table, hover over items to send them to the crafting grid
+- Hover over crafting grid slots to move items back to inventory
+- Hover over the crafting output to collect crafted items
+
 ## Configuration
 
 Access via **ModMenu** or edit `config/simpleloot.json`
@@ -31,6 +48,10 @@ Access via **ModMenu** or edit `config/simpleloot.json`
 | Hotbar Protection | Protect hotbar slots | `false` |
 | Transfer Delay | Delay between transfers (ms) | `0` |
 | Debug Mode | Enable debug logging | `false` |
+| Allow Hover Drop | Enable drop mode (Ctrl+hover) | `true` |
+| Allow Crafting Grid | Enable crafting grid transfers | `true` |
+| Allow Armor Equip | Enable armor equip via hover | `true` |
+| Armor Swap Delay | Delay between armor swaps (ms) | `70` |
 | Container Types | Per-container enable/disable | All enabled |
 
 ## Keybindings
@@ -40,6 +61,7 @@ All keybindings support both keyboard keys and mouse buttons.
 | Keybind | Description | Default |
 |---------|-------------|---------|
 | Hover Loot (Hold) | Hold to transfer items you hover over | Unbound |
+| Hover Drop (Hold) | Hold to drop items you hover over | Unbound |
 | Enable/Disable | Toggle the mod on/off | Unbound |
 | Open Config | Open config screen | Unbound |
 

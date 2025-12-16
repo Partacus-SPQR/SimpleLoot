@@ -33,6 +33,7 @@ public class SimpleLootClient implements ClientModInitializer {
 
     // Keybindings - all unbound by default to prevent conflicts
     public static KeyBinding hoverLootKeyBinding;  // Hold to hover loot
+    public static KeyBinding hoverDropKeyBinding;  // Hold to hover drop (alternative to Ctrl+HoverLoot)
     public static KeyBinding toggleKeyBinding;     // Enable/disable the mod
     public static KeyBinding configKeyBinding;     // Open config screen
     public static KeyBinding reloadConfigKeyBinding; // Reload config from file
@@ -49,6 +50,14 @@ public class SimpleLootClient implements ClientModInitializer {
         // Main hover loot key - hold to transfer items you hover over
         hoverLootKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.simpleloot.hover_loot",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_UNKNOWN,
+                KEYBIND_CATEGORY
+        ));
+
+        // Hover drop key - hold to drop items you hover over (alternative to Ctrl+HoverLoot)
+        hoverDropKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.simpleloot.hover_drop",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_UNKNOWN,
                 KEYBIND_CATEGORY
@@ -174,6 +183,40 @@ public class SimpleLootClient implements ClientModInitializer {
      */
     public static boolean isHoverLootActive() {
         return isHoverLootKeyHeld();
+    }
+    
+    /**
+     * Checks if the hover drop key is currently being held down.
+     * 
+     * @return true if the hover drop key is currently pressed
+     */
+    public static boolean isHoverDropKeyHeld() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null || client.getWindow() == null) {
+            return false;
+        }
+        
+        // Get the bound key code from the keybinding
+        InputUtil.Key boundKey = InputUtil.fromTranslationKey(hoverDropKeyBinding.getBoundKeyTranslationKey());
+        
+        // If the key is unbound (UNKNOWN), return false
+        if (boundKey.equals(InputUtil.UNKNOWN_KEY)) {
+            return false;
+        }
+        
+        long windowHandle = client.getWindow().getHandle();
+        
+        // For keyboard keys, check if the key is currently pressed
+        if (boundKey.getCategory() == InputUtil.Type.KEYSYM) {
+            return GLFW.glfwGetKey(windowHandle, boundKey.getCode()) == GLFW.GLFW_PRESS;
+        }
+        
+        // For mouse buttons, check if the button is pressed
+        if (boundKey.getCategory() == InputUtil.Type.MOUSE) {
+            return GLFW.glfwGetMouseButton(windowHandle, boundKey.getCode()) == GLFW.GLFW_PRESS;
+        }
+        
+        return false;
     }
     
     /**

@@ -48,8 +48,10 @@ public class ModConfigScreen {
                 .build());
         
         general.addEntry(entryBuilder
-                .startIntSlider(Text.translatable("config.simpleloot.transferDelayMs"), config.transferDelayMs, 0, 200)
+                .startIntField(Text.translatable("config.simpleloot.transferDelayMs"), config.transferDelayMs)
                 .setDefaultValue(0)
+                .setMin(0)
+                .setMax(500)
                 .setTooltip(Text.translatable("config.simpleloot.transferDelayMs.tooltip"))
                 .setSaveConsumer(value -> config.transferDelayMs = value)
                 .build());
@@ -59,6 +61,36 @@ public class ModConfigScreen {
                 .setDefaultValue(false)
                 .setTooltip(Text.translatable("config.simpleloot.debugMode.tooltip"))
                 .setSaveConsumer(value -> config.debugMode = value)
+                .build());
+        
+        general.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowHoverDrop"), config.allowHoverDrop)
+                .setDefaultValue(true)
+                .setTooltip(Text.translatable("config.simpleloot.allowHoverDrop.tooltip"))
+                .setSaveConsumer(value -> config.allowHoverDrop = value)
+                .build());
+        
+        general.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowCraftingGrid"), config.allowCraftingGrid)
+                .setDefaultValue(true)
+                .setTooltip(Text.translatable("config.simpleloot.allowCraftingGrid.tooltip"))
+                .setSaveConsumer(value -> config.allowCraftingGrid = value)
+                .build());
+        
+        general.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowArmorEquip"), config.allowArmorEquip)
+                .setDefaultValue(true)
+                .setTooltip(Text.translatable("config.simpleloot.allowArmorEquip.tooltip"))
+                .setSaveConsumer(value -> config.allowArmorEquip = value)
+                .build());
+        
+        general.addEntry(entryBuilder
+                .startIntField(Text.translatable("config.simpleloot.armorSwapDelayMs"), config.armorSwapDelayMs)
+                .setDefaultValue(100)
+                .setMin(0)
+                .setMax(500)
+                .setTooltip(Text.translatable("config.simpleloot.armorSwapDelayMs.tooltip"))
+                .setSaveConsumer(value -> config.armorSwapDelayMs = value)
                 .build());
         
         // Container Settings Category
@@ -126,6 +158,11 @@ public class ModConfigScreen {
         keybinds.addEntry(entryBuilder.fillKeybindingField(
                 Text.translatable("key.simpleloot.hover_loot"),
                 SimpleLootClient.hoverLootKeyBinding)
+                .build());
+        
+        keybinds.addEntry(entryBuilder.fillKeybindingField(
+                Text.translatable("key.simpleloot.hover_drop"),
+                SimpleLootClient.hoverDropKeyBinding)
                 .build());
         
         keybinds.addEntry(entryBuilder.fillKeybindingField(

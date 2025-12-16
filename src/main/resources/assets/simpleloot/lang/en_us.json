@@ -3,6 +3,7 @@
     "key.category.simpleloot:category": "SimpleLoot",
     
     "key.simpleloot.hover_loot": "Hover Loot (Hold)",
+    "key.simpleloot.hover_drop": "Hover Drop (Hold)",
     "key.simpleloot.toggle": "Enable/Disable SimpleLoot",
     "key.simpleloot.config": "Open Config Screen",
     "key.simpleloot.reload_config": "Reload Config File",
@@ -34,5 +35,17 @@
     "config.simpleloot.allowEnderChests": "Allow Ender Chests",
     "config.simpleloot.allowDispensers": "Allow Dispensers",
     "config.simpleloot.allowDroppers": "Allow Droppers",
-    "config.simpleloot.allowHoppers": "Allow Hoppers"
+    "config.simpleloot.allowHoppers": "Allow Hoppers",
+    
+    "config.simpleloot.allowHoverDrop": "Allow Hover Drop",
+    "config.simpleloot.allowHoverDrop.tooltip": "Enable Ctrl + Hover Loot to drop entire stacks on the ground instead of transferring",
+    
+    "config.simpleloot.allowCraftingGrid": "Allow Crafting Grid",
+    "config.simpleloot.allowCraftingGrid.tooltip": "Enable hover loot to send items to/from crafting grids (2x2 in inventory, 3x3 in crafting table)",
+    
+    "config.simpleloot.allowArmorEquip": "Allow Armor Equip",
+    "config.simpleloot.allowArmorEquip.tooltip": "Enable hover loot on armor items in inventory to automatically equip/unequip them",
+    
+    "config.simpleloot.armorSwapDelayMs": "Armor Swap Delay (ms)",
+    "config.simpleloot.armorSwapDelayMs.tooltip": "Delay between armor swaps in milliseconds. Lower values = faster swapping but may cause issues. Default: 70ms"
 }

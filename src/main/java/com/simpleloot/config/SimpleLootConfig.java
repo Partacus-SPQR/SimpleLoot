@@ -37,6 +37,12 @@ public class SimpleLootConfig {
     public boolean allowDroppers = true;
     public boolean allowHoppers = true;
     
+    // Feature Settings
+    public boolean allowHoverDrop = true; // Enable Ctrl+HoverLoot to drop items
+    public boolean allowCraftingGrid = true; // Enable hover loot to/from crafting grids (2x2 and 3x3)
+    public boolean allowArmorEquip = true; // Enable hover loot on armor in inventory to equip/swap
+    public int armorSwapDelayMs = 70; // Delay between armor swaps in milliseconds (prevents issues with fast swapping)
+    
     /**
      * Gets the singleton config instance.
      */
@@ -104,6 +110,10 @@ public class SimpleLootConfig {
         this.allowDispensers = defaults.allowDispensers;
         this.allowDroppers = defaults.allowDroppers;
         this.allowHoppers = defaults.allowHoppers;
+        this.allowHoverDrop = defaults.allowHoverDrop;
+        this.allowCraftingGrid = defaults.allowCraftingGrid;
+        this.allowArmorEquip = defaults.allowArmorEquip;
+        this.armorSwapDelayMs = defaults.armorSwapDelayMs;
         save();
     }
 }

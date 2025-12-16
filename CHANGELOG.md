@@ -2,6 +2,27 @@
 
 All notable changes to SimpleLoot will be documented in this file.
 
+## [1.3.0] - 2025-12-16
+
+### Added
+- **Hover Drop feature**: Hold Ctrl + hover loot key (or dedicated hover drop key) to drop items on the ground while hovering
+- **Dedicated hover drop keybind**: Can be bound separately from the main hover loot key
+- **Crafting Grid support**: Hover over inventory items while in player inventory to send entire stacks to the 2x2 crafting grid
+- **Crafting Table support**: Works with 3x3 crafting grid in crafting tables
+- **Bidirectional crafting transfers**: Hover over crafting grid slots to move items back to inventory
+- **Crafting output collection**: Hover over the crafting output slot to take the crafted result
+- **Armor Equip feature**: Hover over armor pieces in inventory to equip them, or hover over worn armor slots to unequip
+- New config option `allowHoverDrop` to enable/disable drop mode
+- New config option `allowCraftingGrid` to enable/disable crafting grid transfers
+- New config option `allowArmorEquip` to enable/disable armor equip via hover loot
+- New config option `armorSwapDelayMs` to control delay between armor swaps (default: 70ms)
+- Creative inventory support for hover drop (survival tab)
+
+### Fixed
+- Items now transfer as full stacks to crafting grid (was incorrectly splitting stacks)
+
+---
+
 ## [1.2.1] - 2025-12-11
 
 ### Added
