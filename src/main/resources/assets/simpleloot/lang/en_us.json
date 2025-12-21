@@ -13,7 +13,9 @@
     "config.simpleloot.cancel": "Cancel",
     
     "config.simpleloot.category.general": "General Settings",
-    "config.simpleloot.category.containers": "Container Settings",
+    "config.simpleloot.category.containers": "Storage Containers",
+    "config.simpleloot.category.processing": "Processing Blocks",
+    "config.simpleloot.category.workstations": "Workstations",
     "config.simpleloot.category.keybinds": "Keybindings",
     
     "config.simpleloot.enabled": "Enable SimpleLoot",
@@ -36,6 +38,21 @@
     "config.simpleloot.allowDispensers": "Allow Dispensers",
     "config.simpleloot.allowDroppers": "Allow Droppers",
     "config.simpleloot.allowHoppers": "Allow Hoppers",
+    
+    "config.simpleloot.allowFurnaces": "Allow Furnaces",
+    "config.simpleloot.allowBlastFurnaces": "Allow Blast Furnaces",
+    "config.simpleloot.allowSmokers": "Allow Smokers",
+    "config.simpleloot.allowBrewingStands": "Allow Brewing Stands",
+    
+    "config.simpleloot.allowAnvils": "Allow Anvils",
+    "config.simpleloot.allowSmithingTables": "Allow Smithing Tables",
+    "config.simpleloot.allowGrindstones": "Allow Grindstones",
+    "config.simpleloot.allowStonecutters": "Allow Stonecutters",
+    "config.simpleloot.allowLooms": "Allow Looms",
+    "config.simpleloot.allowEnchantingTables": "Allow Enchanting Tables",
+    "config.simpleloot.allowBeacons": "Allow Beacons",
+    "config.simpleloot.allowCrafters": "Allow Crafters",
+    "config.simpleloot.allowCartographyTables": "Allow Cartography Tables",
     
     "config.simpleloot.allowHoverDrop": "Allow Hover Drop",
     "config.simpleloot.allowHoverDrop.tooltip": "Enable Ctrl + Hover Loot to drop entire stacks on the ground instead of transferring. Default: ON",

@@ -26,7 +26,11 @@ A lightweight Fabric mod for Minecraft that adds **Rust-style Hover Loot** - qui
 
 ## Supported Screens
 
-**Containers:** Chests, Double Chests, Barrels, Shulker Boxes, Ender Chests, Dispensers, Droppers, Hoppers
+**Storage:** Chests, Double Chests, Barrels, Shulker Boxes, Ender Chests, Dispensers, Droppers, Hoppers
+
+**Processing:** Furnaces, Blast Furnaces, Smokers, Brewing Stands
+
+**Workstations:** Anvils, Smithing Tables, Grindstones, Stonecutters, Looms, Enchanting Tables, Beacons, Crafters, Cartography Tables
 
 **Inventory:** Player inventory slots, Crafting Table (3x3), Survival inventory crafting (2x2)
 

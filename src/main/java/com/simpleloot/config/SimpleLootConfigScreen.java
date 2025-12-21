@@ -58,6 +58,7 @@ public class SimpleLootConfigScreen extends Screen {
     private boolean allowCraftingGrid;
     private boolean allowArmorEquip;
     private int armorSwapDelayMs;
+    // Storage containers
     private boolean allowChests;
     private boolean allowDoubleChests;
     private boolean allowBarrels;
@@ -66,6 +67,21 @@ public class SimpleLootConfigScreen extends Screen {
     private boolean allowHoppers;
     private boolean allowDroppers;
     private boolean allowDispensers;
+    // Processing containers
+    private boolean allowFurnaces;
+    private boolean allowBlastFurnaces;
+    private boolean allowSmokers;
+    private boolean allowBrewingStands;
+    // Workstations
+    private boolean allowAnvils;
+    private boolean allowSmithingTables;
+    private boolean allowGrindstones;
+    private boolean allowStonecutters;
+    private boolean allowLooms;
+    private boolean allowEnchantingTables;
+    private boolean allowBeacons;
+    private boolean allowCrafters;
+    private boolean allowCartographyTables;
 
     // Reference to transfer delay slider for reset
     private TransferDelaySlider transferDelaySlider;
@@ -85,6 +101,7 @@ public class SimpleLootConfigScreen extends Screen {
         this.allowCraftingGrid = config.allowCraftingGrid;
         this.allowArmorEquip = config.allowArmorEquip;
         this.armorSwapDelayMs = config.armorSwapDelayMs;
+        // Storage containers
         this.allowChests = config.allowChests;
         this.allowDoubleChests = config.allowDoubleChests;
         this.allowBarrels = config.allowBarrels;
@@ -93,6 +110,21 @@ public class SimpleLootConfigScreen extends Screen {
         this.allowHoppers = config.allowHoppers;
         this.allowDroppers = config.allowDroppers;
         this.allowDispensers = config.allowDispensers;
+        // Processing containers
+        this.allowFurnaces = config.allowFurnaces;
+        this.allowBlastFurnaces = config.allowBlastFurnaces;
+        this.allowSmokers = config.allowSmokers;
+        this.allowBrewingStands = config.allowBrewingStands;
+        // Workstations
+        this.allowAnvils = config.allowAnvils;
+        this.allowSmithingTables = config.allowSmithingTables;
+        this.allowGrindstones = config.allowGrindstones;
+        this.allowStonecutters = config.allowStonecutters;
+        this.allowLooms = config.allowLooms;
+        this.allowEnchantingTables = config.allowEnchantingTables;
+        this.allowBeacons = config.allowBeacons;
+        this.allowCrafters = config.allowCrafters;
+        this.allowCartographyTables = config.allowCartographyTables;
     }
 
     @Override
@@ -108,8 +140,8 @@ public class SimpleLootConfigScreen extends Screen {
         int resetX = widgetX + WIDGET_WIDTH + SPACING;
         int y = HEADER_HEIGHT;
         
-        // Count options for scroll calculation (16 options now with armor swap delay)
-        int numberOfOptions = 16;
+        // Count options for scroll calculation (29 options total with new containers)
+        int numberOfOptions = 29;
         contentHeight = numberOfOptions * ROW_HEIGHT;
         int contentAreaHeight = this.height - HEADER_HEIGHT - FOOTER_HEIGHT;
         maxScrollOffset = Math.max(0, contentHeight - contentAreaHeight);
@@ -212,6 +244,73 @@ public class SimpleLootConfigScreen extends Screen {
         addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from dispensers. Default: ON");
         addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowDispensers", 
             () -> allowDispensers, v -> allowDispensers = v, true);
+        y += ROW_HEIGHT;
+        
+        // Processing containers
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from furnaces. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowFurnaces", 
+            () -> allowFurnaces, v -> allowFurnaces = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from blast furnaces. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowBlastFurnaces", 
+            () -> allowBlastFurnaces, v -> allowBlastFurnaces = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from smokers. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowSmokers", 
+            () -> allowSmokers, v -> allowSmokers = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from brewing stands. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowBrewingStands", 
+            () -> allowBrewingStands, v -> allowBrewingStands = v, true);
+        y += ROW_HEIGHT;
+        
+        // Workstations
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from anvils. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowAnvils", 
+            () -> allowAnvils, v -> allowAnvils = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from smithing tables. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowSmithingTables", 
+            () -> allowSmithingTables, v -> allowSmithingTables = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from grindstones. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowGrindstones", 
+            () -> allowGrindstones, v -> allowGrindstones = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from stonecutters. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowStonecutters", 
+            () -> allowStonecutters, v -> allowStonecutters = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from looms. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowLooms", 
+            () -> allowLooms, v -> allowLooms = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from enchanting tables. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowEnchantingTables", 
+            () -> allowEnchantingTables, v -> allowEnchantingTables = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from beacons. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowBeacons", 
+            () -> allowBeacons, v -> allowBeacons = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from crafters. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowCrafters", 
+            () -> allowCrafters, v -> allowCrafters = v, true);
+        y += ROW_HEIGHT;
+        
+        addTooltip(widgetX, y, totalWidth, 20, "Allow hover-looting from cartography tables. Default: ON");
+        addScrollableToggleWithReset(widgetX, y, resetX, "config.simpleloot.allowCartographyTables", 
+            () -> allowCartographyTables, v -> allowCartographyTables = v, true);
         
         // Bottom buttons (fixed, not scrollable)
         int bottomY = this.height - FOOTER_HEIGHT + 7;
@@ -303,6 +402,7 @@ public class SimpleLootConfigScreen extends Screen {
         config.allowCraftingGrid = this.allowCraftingGrid;
         config.allowArmorEquip = this.allowArmorEquip;
         config.armorSwapDelayMs = this.armorSwapDelayMs;
+        // Storage containers
         config.allowChests = this.allowChests;
         config.allowDoubleChests = this.allowDoubleChests;
         config.allowBarrels = this.allowBarrels;
@@ -311,6 +411,21 @@ public class SimpleLootConfigScreen extends Screen {
         config.allowHoppers = this.allowHoppers;
         config.allowDroppers = this.allowDroppers;
         config.allowDispensers = this.allowDispensers;
+        // Processing containers
+        config.allowFurnaces = this.allowFurnaces;
+        config.allowBlastFurnaces = this.allowBlastFurnaces;
+        config.allowSmokers = this.allowSmokers;
+        config.allowBrewingStands = this.allowBrewingStands;
+        // Workstations
+        config.allowAnvils = this.allowAnvils;
+        config.allowSmithingTables = this.allowSmithingTables;
+        config.allowGrindstones = this.allowGrindstones;
+        config.allowStonecutters = this.allowStonecutters;
+        config.allowLooms = this.allowLooms;
+        config.allowEnchantingTables = this.allowEnchantingTables;
+        config.allowBeacons = this.allowBeacons;
+        config.allowCrafters = this.allowCrafters;
+        config.allowCartographyTables = this.allowCartographyTables;
         config.save();
     }
     

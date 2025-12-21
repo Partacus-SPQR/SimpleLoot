@@ -27,7 +27,7 @@ public class SimpleLootConfig {
     // Transfer Settings
     public int transferDelayMs = 20; // Delay between transfers in milliseconds (0 = instant)
     
-    // Container Settings
+    // Container Settings - Storage
     public boolean allowChests = true;
     public boolean allowDoubleChests = true;
     public boolean allowBarrels = true;
@@ -36,6 +36,23 @@ public class SimpleLootConfig {
     public boolean allowDispensers = true;
     public boolean allowDroppers = true;
     public boolean allowHoppers = true;
+    
+    // Container Settings - Processing
+    public boolean allowFurnaces = true;
+    public boolean allowBlastFurnaces = true;
+    public boolean allowSmokers = true;
+    public boolean allowBrewingStands = true;
+    
+    // Container Settings - Workstations
+    public boolean allowAnvils = true;
+    public boolean allowSmithingTables = true;
+    public boolean allowGrindstones = true;
+    public boolean allowStonecutters = true;
+    public boolean allowLooms = true;
+    public boolean allowEnchantingTables = true;
+    public boolean allowBeacons = true;
+    public boolean allowCrafters = true;
+    public boolean allowCartographyTables = true;
     
     // Feature Settings
     public boolean allowHoverDrop = true; // Enable Ctrl+HoverLoot to drop items
@@ -102,6 +119,7 @@ public class SimpleLootConfig {
         this.debugMode = defaults.debugMode;
         this.hotbarProtection = defaults.hotbarProtection;
         this.transferDelayMs = defaults.transferDelayMs;
+        // Storage containers
         this.allowChests = defaults.allowChests;
         this.allowDoubleChests = defaults.allowDoubleChests;
         this.allowBarrels = defaults.allowBarrels;
@@ -110,6 +128,22 @@ public class SimpleLootConfig {
         this.allowDispensers = defaults.allowDispensers;
         this.allowDroppers = defaults.allowDroppers;
         this.allowHoppers = defaults.allowHoppers;
+        // Processing containers
+        this.allowFurnaces = defaults.allowFurnaces;
+        this.allowBlastFurnaces = defaults.allowBlastFurnaces;
+        this.allowSmokers = defaults.allowSmokers;
+        this.allowBrewingStands = defaults.allowBrewingStands;
+        // Workstations
+        this.allowAnvils = defaults.allowAnvils;
+        this.allowSmithingTables = defaults.allowSmithingTables;
+        this.allowGrindstones = defaults.allowGrindstones;
+        this.allowStonecutters = defaults.allowStonecutters;
+        this.allowLooms = defaults.allowLooms;
+        this.allowEnchantingTables = defaults.allowEnchantingTables;
+        this.allowBeacons = defaults.allowBeacons;
+        this.allowCrafters = defaults.allowCrafters;
+        this.allowCartographyTables = defaults.allowCartographyTables;
+        // Features
         this.allowHoverDrop = defaults.allowHoverDrop;
         this.allowCraftingGrid = defaults.allowCraftingGrid;
         this.allowArmorEquip = defaults.allowArmorEquip;

@@ -172,6 +172,60 @@ public class HoverLootHandler {
             return config.allowHoppers;
         }
         
+        // Processing screens (furnaces, etc.)
+        if (screen instanceof FurnaceScreen) {
+            return config.allowFurnaces;
+        }
+        
+        if (screen instanceof BlastFurnaceScreen) {
+            return config.allowBlastFurnaces;
+        }
+        
+        if (screen instanceof SmokerScreen) {
+            return config.allowSmokers;
+        }
+        
+        if (screen instanceof BrewingStandScreen) {
+            return config.allowBrewingStands;
+        }
+        
+        // Workstation screens
+        if (screen instanceof AnvilScreen) {
+            return config.allowAnvils;
+        }
+        
+        if (screen instanceof SmithingScreen) {
+            return config.allowSmithingTables;
+        }
+        
+        if (screen instanceof GrindstoneScreen) {
+            return config.allowGrindstones;
+        }
+        
+        if (screen instanceof StonecutterScreen) {
+            return config.allowStonecutters;
+        }
+        
+        if (screen instanceof LoomScreen) {
+            return config.allowLooms;
+        }
+        
+        if (screen instanceof EnchantmentScreen) {
+            return config.allowEnchantingTables;
+        }
+        
+        if (screen instanceof BeaconScreen) {
+            return config.allowBeacons;
+        }
+        
+        if (screen instanceof CrafterScreen) {
+            return config.allowCrafters;
+        }
+        
+        if (screen instanceof CartographyTableScreen) {
+            return config.allowCartographyTables;
+        }
+        
         // Ender chest uses GenericContainerScreen, but we can check by title or other means
         // For now, GenericContainerScreen covers ender chests as well
         

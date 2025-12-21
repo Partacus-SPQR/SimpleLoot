@@ -12,10 +12,13 @@ All notable changes to SimpleLoot will be documented in this file.
 - **Bidirectional crafting transfers**: Hover over crafting grid slots to move items back to inventory
 - **Crafting output collection**: Hover over the crafting output slot to take the crafted result
 - **Armor Equip feature**: Hover over armor pieces in inventory to equip them, or hover over worn armor slots to unequip
+- **Processing block support**: Furnaces, Blast Furnaces, Smokers, Brewing Stands
+- **Workstation support**: Anvils, Smithing Tables, Grindstones, Stonecutters, Looms, Enchanting Tables, Beacons, Crafters, Cartography Tables
 - New config option `allowHoverDrop` to enable/disable drop mode
 - New config option `allowCraftingGrid` to enable/disable crafting grid transfers
 - New config option `allowArmorEquip` to enable/disable armor equip via hover loot
 - New config option `armorSwapDelayMs` to control delay between armor swaps (default: 70ms)
+- Per-block-type enable/disable options for all new supported screens
 - Creative inventory support for hover drop (survival tab)
 - **Multi-version support**: Now supports Minecraft 1.21.9, 1.21.10, and 1.21.11
 - **Stonecutter build system**: Single codebase builds for multiple Minecraft versions

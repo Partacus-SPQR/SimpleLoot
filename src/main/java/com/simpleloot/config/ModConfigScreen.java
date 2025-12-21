@@ -97,6 +97,7 @@ public class ModConfigScreen {
         ConfigCategory containers = builder.getOrCreateCategory(
                 Text.translatable("config.simpleloot.category.containers"));
         
+        // Storage containers
         containers.addEntry(entryBuilder
                 .startBooleanToggle(Text.translatable("config.simpleloot.allowChests"), config.allowChests)
                 .setDefaultValue(true)
@@ -143,6 +144,92 @@ public class ModConfigScreen {
                 .startBooleanToggle(Text.translatable("config.simpleloot.allowHoppers"), config.allowHoppers)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowHoppers = value)
+                .build());
+        
+        // Processing Category
+        ConfigCategory processing = builder.getOrCreateCategory(
+                Text.translatable("config.simpleloot.category.processing"));
+        
+        processing.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowFurnaces"), config.allowFurnaces)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowFurnaces = value)
+                .build());
+        
+        processing.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowBlastFurnaces"), config.allowBlastFurnaces)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowBlastFurnaces = value)
+                .build());
+        
+        processing.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowSmokers"), config.allowSmokers)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowSmokers = value)
+                .build());
+        
+        processing.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowBrewingStands"), config.allowBrewingStands)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowBrewingStands = value)
+                .build());
+        
+        // Workstations Category
+        ConfigCategory workstations = builder.getOrCreateCategory(
+                Text.translatable("config.simpleloot.category.workstations"));
+        
+        workstations.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowAnvils"), config.allowAnvils)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowAnvils = value)
+                .build());
+        
+        workstations.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowSmithingTables"), config.allowSmithingTables)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowSmithingTables = value)
+                .build());
+        
+        workstations.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowGrindstones"), config.allowGrindstones)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowGrindstones = value)
+                .build());
+        
+        workstations.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowStonecutters"), config.allowStonecutters)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowStonecutters = value)
+                .build());
+        
+        workstations.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowLooms"), config.allowLooms)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowLooms = value)
+                .build());
+        
+        workstations.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowEnchantingTables"), config.allowEnchantingTables)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowEnchantingTables = value)
+                .build());
+        
+        workstations.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowBeacons"), config.allowBeacons)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowBeacons = value)
+                .build());
+        
+        workstations.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowCrafters"), config.allowCrafters)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowCrafters = value)
+                .build());
+        
+        workstations.addEntry(entryBuilder
+                .startBooleanToggle(Text.translatable("config.simpleloot.allowCartographyTables"), config.allowCartographyTables)
+                .setDefaultValue(true)
+                .setSaveConsumer(value -> config.allowCartographyTables = value)
                 .build());
         
         // Keybindings Category
