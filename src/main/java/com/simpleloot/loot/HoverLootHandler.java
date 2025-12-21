@@ -13,8 +13,8 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.lwjgl.glfw.GLFW;
@@ -399,6 +399,13 @@ public class HoverLootHandler {
                                     // Delay has passed, remove from tracking
                                     armorSwapTimes.remove(slotId);
                                 }
+                            }
+                            
+                            // Validate item for specific screen types
+                            if (!isValidSlotTransfer(screen, slot, slot.getStack(), isPlayerInventorySlotGeneric(screen, slot))) {
+                                if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Skipped slot {} - item {} not valid for this screen type", 
+                                        slotId, slot.getStack().getName().getString());
+                                continue;
                             }
                             
                             pendingSlots.add(slotId);
@@ -1076,6 +1083,128 @@ public class HoverLootHandler {
         );
         
         if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Used PICKUP method for creative inventory (actualSlotId={})", actualSlotId);
+    }
+    
+    /**
+     * Checks if a slot is a player inventory slot in any screen type.
+     * This is a generic check that works for all container screens.
+     */
+    private static boolean isPlayerInventorySlotGeneric(HandledScreen<?> screen, Slot slot) {
+        // Most container screens have the player inventory in the last 36 slots
+        // The container slots come first, then player inventory (27 main + 9 hotbar)
+        var handler = screen.getScreenHandler();
+        int totalSlots = handler.slots.size();
+        
+        // Player inventory is typically the last 36 slots
+        // Slot IDs: totalSlots - 36 to totalSlots - 1
+        int playerInvStart = totalSlots - 36;
+        return slot.id >= playerInvStart;
+    }
+    
+    /**
+     * Checks if an item can be used as fuel in a furnace.
+     * Note: We rely on Minecraft's quick-move behavior which already validates items.
+     * The fuel slot in furnaces accepts any valid fuel - this method is kept for future use.
+     */
+    @SuppressWarnings("unused")
+    private static boolean isFuelItem(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        // For now, we let Minecraft's quick-move handle fuel validation
+        // The slot's canInsert() method properly validates fuel items
+        // This is a placeholder for more detailed validation if needed
+        return true;
+    }
+    
+    /**
+     * Checks if an item is enchantable (can be placed in enchanting table slot).
+     * Items that are enchantable:
+     * - Items with durability (tools, weapons, armor)
+     * - Books (for enchanted books)
+     * - Items that already have the ENCHANTABLE component
+     */
+    private static boolean isEnchantableItem(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        
+        // Check if item is a book (can become enchanted book)
+        if (stack.isOf(Items.BOOK)) {
+            return true;
+        }
+        
+        // Check if item has max damage (durability) - this covers tools, weapons, armor
+        if (stack.getMaxDamage() > 0) {
+            return true;
+        }
+        
+        // Check for enchantable component (some items may be enchantable without durability)
+        // This handles edge cases like fishing rods, flint and steel, shears, etc.
+        if (stack.contains(DataComponentTypes.ENCHANTABLE)) {
+            return true;
+        }
+        
+        // Check for items that can already have enchantments
+        if (stack.contains(DataComponentTypes.ENCHANTMENTS)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Checks if a slot transfer should be allowed based on the screen type and slot position.
+     * This validates that items are appropriate for specific slots in specialized screens.
+     * 
+     * @param screen The current screen
+     * @param slot The slot being hovered
+     * @param stack The item stack in the slot
+     * @param isFromPlayerInventory True if the slot is in player inventory (transferring TO container)
+     * @return True if the transfer should be allowed
+     */
+    private static boolean isValidSlotTransfer(HandledScreen<?> screen, Slot slot, ItemStack stack, boolean isFromPlayerInventory) {
+        // For furnace-type screens, all transfers are allowed
+        // Minecraft's quick-move handles putting items in the correct slots automatically
+        if (screen instanceof FurnaceScreen || screen instanceof BlastFurnaceScreen || screen instanceof SmokerScreen) {
+            // All transfers allowed - Minecraft will put items in correct slots
+            return true;
+        }
+        
+        // For enchanting table, validate that only enchantable items or lapis can be transferred
+        if (screen instanceof EnchantmentScreen) {
+            if (isFromPlayerInventory) {
+                // Transferring FROM player inventory TO enchanting table
+                // Only allow enchantable items or lapis lazuli
+                if (!isEnchantableItem(stack) && !stack.isOf(Items.LAPIS_LAZULI)) {
+                    return false;
+                }
+            }
+            // Transferring FROM enchanting table slots to inventory is always allowed
+            return true;
+        }
+        
+        // For beacon, validate payment items
+        if (screen instanceof BeaconScreen) {
+            if (isFromPlayerInventory) {
+                // Beacon accepts specific payment items: iron/gold/emerald/diamond/netherite ingot
+                if (!isBeaconPaymentItem(stack)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // All other screens - allow transfers
+        return true;
+    }
+    
+    /**
+     * Checks if an item is valid for beacon payment slot.
+     */
+    private static boolean isBeaconPaymentItem(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        return stack.isOf(Items.IRON_INGOT) || 
+               stack.isOf(Items.GOLD_INGOT) || 
+               stack.isOf(Items.EMERALD) || 
+               stack.isOf(Items.DIAMOND) || 
+               stack.isOf(Items.NETHERITE_INGOT);
     }
     
     /**
