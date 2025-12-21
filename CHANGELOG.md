@@ -2,6 +2,18 @@
 
 All notable changes to SimpleLoot will be documented in this file.
 
+## [1.3.1] - 2025-12-21
+
+### Added
+- **Item validation for Enchanting Tables**: Only enchantable items (tools, weapons, armor, books) and lapis lazuli can be transferred to the enchanting table
+- **Item validation for Beacons**: Only valid payment items (iron/gold/emerald/diamond/netherite ingots) can be transferred to beacon slots
+- Smart slot detection for processing and workstation screens
+
+### Changed
+- Furnace slot handling now relies on Minecraft's built-in quick-move logic for proper item placement (smeltable items to input, fuel to fuel slot)
+
+---
+
 ## [1.3.0] - 2025-12-16
 
 ### Added
