@@ -1,27 +1,26 @@
 package com.simpleloot.config;
 
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.option.KeybindsScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.text.Text;
+//? if >=26.1 {
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import net.minecraft.client.gui.GuiGraphics;*/
+//?}
+import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Vanilla-style fallback config screen for SimpleLoot.
- * Used when Cloth Config is unavailable or incompatible.
- * Features: sliders, tooltips, reset buttons, and scrollable content with interactive scrollbar.
- */
 public class SimpleLootConfigScreen extends Screen {
     private final Screen parent;
     private final SimpleLootConfig config;
     
-    // Layout constants per guide
+    // Layout constants
     private static final int HEADER_HEIGHT = 35;
     private static final int FOOTER_HEIGHT = 35;
     private static final int ROW_HEIGHT = 24;
@@ -43,11 +42,11 @@ public class SimpleLootConfigScreen extends Screen {
     private final List<TooltipEntry> tooltips = new ArrayList<>();
     
     // Track scrollable widgets with their original Y positions
-    private record WidgetEntry(ClickableWidget widget, int originalY) {}
+    private record WidgetEntry(AbstractWidget widget, int originalY) {}
     private final List<WidgetEntry> scrollableWidgets = new ArrayList<>();
     
     // Track footer buttons (non-scrollable)
-    private final List<ClickableWidget> footerButtons = new ArrayList<>();
+    private final List<AbstractWidget> footerButtons = new ArrayList<>();
     
     // Store current values (we modify these, then save on Done)
     private boolean enabled;
@@ -88,7 +87,7 @@ public class SimpleLootConfigScreen extends Screen {
     private ArmorSwapDelaySlider armorSwapDelaySlider;
 
     public SimpleLootConfigScreen(Screen parent) {
-        super(Text.translatable("config.simpleloot.title"));
+        super(Component.translatable("config.simpleloot.title"));
         this.parent = parent;
         this.config = SimpleLootConfig.getInstance();
         
@@ -140,7 +139,7 @@ public class SimpleLootConfigScreen extends Screen {
         int resetX = widgetX + WIDGET_WIDTH + SPACING;
         int y = HEADER_HEIGHT;
         
-        // Count options for scroll calculation (29 options total with new containers)
+        // Count options for scroll calculation (29 options total)
         int numberOfOptions = 29;
         contentHeight = numberOfOptions * ROW_HEIGHT;
         int contentAreaHeight = this.height - HEADER_HEIGHT - FOOTER_HEIGHT;
@@ -169,10 +168,10 @@ public class SimpleLootConfigScreen extends Screen {
         addTooltip(widgetX, y, totalWidth, 20, "Delay between item transfers in milliseconds. 0 = instant. Default: 20ms");
         transferDelaySlider = new TransferDelaySlider(widgetX, y, WIDGET_WIDTH, 20, transferDelayMs);
         addScrollableWidget(transferDelaySlider, y);
-        ButtonWidget delayReset = ButtonWidget.builder(Text.literal("↺"), button -> {
+        Button delayReset = Button.builder(Component.literal("↺"), button -> {
             transferDelaySlider.setValue(20);
             transferDelayMs = 20;
-        }).dimensions(resetX, y, RESET_BTN_WIDTH, 20).build();
+        }).bounds(resetX, y, RESET_BTN_WIDTH, 20).build();
         addScrollableWidget(delayReset, y);
         y += ROW_HEIGHT;
         
@@ -198,10 +197,10 @@ public class SimpleLootConfigScreen extends Screen {
         addTooltip(widgetX, y, totalWidth, 20, "Delay between armor swaps in milliseconds. Lower = faster but may cause issues. Default: 70ms");
         armorSwapDelaySlider = new ArmorSwapDelaySlider(widgetX, y, WIDGET_WIDTH, 20, armorSwapDelayMs);
         addScrollableWidget(armorSwapDelaySlider, y);
-        ButtonWidget armorDelayReset = ButtonWidget.builder(Text.literal("↺"), button -> {
+        Button armorDelayReset = Button.builder(Component.literal("↺"), button -> {
             armorSwapDelaySlider.setValue(70);
             armorSwapDelayMs = 70;
-        }).dimensions(resetX, y, RESET_BTN_WIDTH, 20).build();
+        }).bounds(resetX, y, RESET_BTN_WIDTH, 20).build();
         addScrollableWidget(armorDelayReset, y);
         y += ROW_HEIGHT;
         
@@ -319,51 +318,51 @@ public class SimpleLootConfigScreen extends Screen {
         int bottomStartX = this.width / 2 - totalBottomWidth / 2;
         
         // Save & Close button
-        ButtonWidget saveBtn = ButtonWidget.builder(Text.literal("Save & Close"), button -> {
+        Button saveBtn = Button.builder(Component.literal("Save & Close"), button -> {
             transferDelayMs = transferDelaySlider.getIntValue();
             saveConfig();
-            this.client.setScreen(parent);
-        }).dimensions(bottomStartX, bottomY, bottomButtonWidth, 20).build();
-        this.addDrawableChild(saveBtn);
+            this.minecraft.setScreen(parent);
+        }).bounds(bottomStartX, bottomY, bottomButtonWidth, 20).build();
+        this.addRenderableWidget(saveBtn);
         footerButtons.add(saveBtn);
         
         // Keybinds button
-        ButtonWidget keybindsBtn = ButtonWidget.builder(Text.translatable("controls.keybinds"), button -> {
-            this.client.setScreen(new KeybindsScreen(this, this.client.options));
-        }).dimensions(bottomStartX + bottomButtonWidth + 4, bottomY, bottomButtonWidth, 20).build();
-        this.addDrawableChild(keybindsBtn);
+        Button keybindsBtn = Button.builder(Component.translatable("controls.keybinds"), button -> {
+            this.minecraft.setScreen(new KeyBindsScreen(this, this.minecraft.options));
+        }).bounds(bottomStartX + bottomButtonWidth + 4, bottomY, bottomButtonWidth, 20).build();
+        this.addRenderableWidget(keybindsBtn);
         footerButtons.add(keybindsBtn);
         
         // Cancel button
-        ButtonWidget cancelBtn = ButtonWidget.builder(Text.translatable("gui.cancel"), button -> {
-            this.client.setScreen(parent);
-        }).dimensions(bottomStartX + bottomButtonWidth * 2 + 8, bottomY, bottomButtonWidth, 20).build();
-        this.addDrawableChild(cancelBtn);
+        Button cancelBtn = Button.builder(Component.translatable("gui.cancel"), button -> {
+            this.minecraft.setScreen(parent);
+        }).bounds(bottomStartX + bottomButtonWidth * 2 + 8, bottomY, bottomButtonWidth, 20).build();
+        this.addRenderableWidget(cancelBtn);
         footerButtons.add(cancelBtn);
         
         // Update widget positions based on initial scroll
         updateWidgetPositions();
     }
     
-    private void addScrollableWidget(ClickableWidget widget, int originalY) {
-        this.addDrawableChild(widget);
+    private void addScrollableWidget(AbstractWidget widget, int originalY) {
+        this.addRenderableWidget(widget);
         scrollableWidgets.add(new WidgetEntry(widget, originalY));
     }
     
     private void addScrollableToggleWithReset(int x, int y, int resetX, String translationKey,
             java.util.function.Supplier<Boolean> getter, java.util.function.Consumer<Boolean> setter, boolean defaultValue) {
-        ButtonWidget toggleBtn = ButtonWidget.builder(getBooleanText(translationKey, getter.get()), button -> {
+        Button toggleBtn = Button.builder(getBooleanText(translationKey, getter.get()), button -> {
             boolean newValue = !getter.get();
             setter.accept(newValue);
             button.setMessage(getBooleanText(translationKey, newValue));
-        }).dimensions(x, y, WIDGET_WIDTH, 20).build();
+        }).bounds(x, y, WIDGET_WIDTH, 20).build();
         addScrollableWidget(toggleBtn, y);
         
         // Reset button
-        ButtonWidget resetBtn = ButtonWidget.builder(Text.literal("↺"), button -> {
+        Button resetBtn = Button.builder(Component.literal("↺"), button -> {
             setter.accept(defaultValue);
             toggleBtn.setMessage(getBooleanText(translationKey, defaultValue));
-        }).dimensions(resetX, y, RESET_BTN_WIDTH, 20).build();
+        }).bounds(resetX, y, RESET_BTN_WIDTH, 20).build();
         addScrollableWidget(resetBtn, y);
     }
     
@@ -371,11 +370,11 @@ public class SimpleLootConfigScreen extends Screen {
         tooltips.add(new TooltipEntry(x, y, width, height, tooltip));
     }
     
-    private Text getBooleanText(String translationKey, boolean value) {
-        return Text.translatable(translationKey)
-                .append(Text.literal(": "))
-                .append(value ? Text.literal("ON").styled(s -> s.withColor(0x55FF55)) 
-                              : Text.literal("OFF").styled(s -> s.withColor(0xFF5555)));
+    private Component getBooleanText(String translationKey, boolean value) {
+        return Component.translatable(translationKey)
+                .append(Component.literal(": "))
+                .append(value ? Component.literal("ON").withStyle(s -> s.withColor(0x55FF55)) 
+                              : Component.literal("OFF").withStyle(s -> s.withColor(0xFF5555)));
     }
     
     private void updateWidgetPositions() {
@@ -429,15 +428,12 @@ public class SimpleLootConfigScreen extends Screen {
         config.save();
     }
     
-    /**
-     * Custom slider widget for transfer delay (0-500ms range).
-     */
-    private class TransferDelaySlider extends SliderWidget {
+    private class TransferDelaySlider extends AbstractSliderButton {
         private static final int MIN = 0;
         private static final int MAX = 500;
         
         public TransferDelaySlider(int x, int y, int width, int height, int initialValue) {
-            super(x, y, width, height, Text.empty(), (double)(initialValue - MIN) / (MAX - MIN));
+            super(x, y, width, height, Component.empty(), (double)(initialValue - MIN) / (MAX - MIN));
             updateMessage();
         }
         
@@ -453,9 +449,9 @@ public class SimpleLootConfigScreen extends Screen {
         @Override
         protected void updateMessage() {
             int val = getIntValue();
-            setMessage(Text.translatable("config.simpleloot.transferDelayMs")
-                    .append(Text.literal(": "))
-                    .append(Text.literal(val + " ms").styled(s -> s.withColor(0xFFFF55))));
+            setMessage(Component.translatable("config.simpleloot.transferDelayMs")
+                    .append(Component.literal(": "))
+                    .append(Component.literal(val + " ms").withStyle(s -> s.withColor(0xFFFF55))));
         }
         
         @Override
@@ -464,15 +460,12 @@ public class SimpleLootConfigScreen extends Screen {
         }
     }
     
-    /**
-     * Custom slider widget for armor swap delay (0-500ms range).
-     */
-    private class ArmorSwapDelaySlider extends SliderWidget {
+    private class ArmorSwapDelaySlider extends AbstractSliderButton {
         private static final int MIN = 0;
         private static final int MAX = 500;
         
         public ArmorSwapDelaySlider(int x, int y, int width, int height, int initialValue) {
-            super(x, y, width, height, Text.empty(), (double)(initialValue - MIN) / (MAX - MIN));
+            super(x, y, width, height, Component.empty(), (double)(initialValue - MIN) / (MAX - MIN));
             updateMessage();
         }
         
@@ -488,9 +481,9 @@ public class SimpleLootConfigScreen extends Screen {
         @Override
         protected void updateMessage() {
             int val = getIntValue();
-            setMessage(Text.translatable("config.simpleloot.armorSwapDelayMs")
-                    .append(Text.literal(": "))
-                    .append(Text.literal(val + " ms").styled(s -> s.withColor(0xFFFF55))));
+            setMessage(Component.translatable("config.simpleloot.armorSwapDelayMs")
+                    .append(Component.literal(": "))
+                    .append(Component.literal(val + " ms").withStyle(s -> s.withColor(0xFFFF55))));
         }
         
         @Override
@@ -514,14 +507,13 @@ public class SimpleLootConfigScreen extends Screen {
     }
     
     // ========================================
-    // Interactive scrollbar - click to start drag (MC 1.21.11 uses Click class)
+    // Interactive scrollbar - mouse events
     // ========================================
     @Override
-    public boolean mouseClicked(Click click, boolean doubleClick) {
-        double mouseX = click.x();
-        double mouseY = click.y();
-        int button = click.button();
-        
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        double mouseX = event.x();
+        double mouseY = event.y();
+        int button = event.button();
         if (button == 0 && maxScrollOffset > 0) {
             int scrollbarX = this.width - SCROLLBAR_WIDTH - 4;
             int scrollbarTrackTop = HEADER_HEIGHT;
@@ -535,11 +527,9 @@ public class SimpleLootConfigScreen extends Screen {
                 int thumbY = scrollbarTrackTop + (int)((trackHeight - thumbHeight) * ((float)scrollOffset / maxScrollOffset));
                 
                 if (mouseY >= thumbY && mouseY <= thumbY + thumbHeight) {
-                    // Clicked on thumb - start dragging
                     isDraggingScrollbar = true;
                     scrollbarDragOffset = (int)(mouseY - thumbY);
                 } else {
-                    // Clicked on track - jump to position
                     int clickOffset = (int)mouseY - scrollbarTrackTop - thumbHeight / 2;
                     float scrollPercent = (float)clickOffset / (trackHeight - thumbHeight);
                     scrollOffset = (int)(scrollPercent * maxScrollOffset);
@@ -551,18 +541,22 @@ public class SimpleLootConfigScreen extends Screen {
                 return true;
             }
         }
-        return super.mouseClicked(click, doubleClick);
+        return super.mouseClicked(event, bl);
     }
     
-    // ========================================
-    // Interactive scrollbar - drag (MC 1.21.11 uses Click class)
-    // ========================================
     @Override
-    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
-        double mouseY = click.y();
-        int button = click.button();
-        
-        if (isDraggingScrollbar && button == 0 && maxScrollOffset > 0) {
+    public boolean mouseReleased(MouseButtonEvent event) {
+        if (event.button() == 0 && isDraggingScrollbar) {
+            isDraggingScrollbar = false;
+            return true;
+        }
+        return super.mouseReleased(event);
+    }
+    
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
+        if (isDraggingScrollbar) {
+            double mouseY = event.y();
             int scrollbarTrackTop = HEADER_HEIGHT;
             int scrollbarTrackBottom = this.height - FOOTER_HEIGHT;
             int trackHeight = scrollbarTrackBottom - scrollbarTrackTop;
@@ -575,27 +569,80 @@ public class SimpleLootConfigScreen extends Screen {
             updateWidgetPositions();
             return true;
         }
-        return super.mouseDragged(click, deltaX, deltaY);
-    }
-    
-    // ========================================
-    // Interactive scrollbar - release (MC 1.21.11 uses Click class)
-    // ========================================
-    @Override
-    public boolean mouseReleased(Click click) {
-        if (click.button() == 0) {
-            isDraggingScrollbar = false;
-        }
-        return super.mouseReleased(click);
+        return super.mouseDragged(event, deltaX, deltaY);
     }
 
+    // ========================================
+    // Render with version conditionals
+    // ========================================
+    //? if >=26.1 {
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        // Dark background
+        context.fillGradient(0, 0, this.width, this.height, 0xC0101010, 0xD0101010);
+        
+        // Title in header area (fixed)
+        context.centeredText(this.font, this.title, this.width / 2, 12, 0xFFFFFF);
+        
+        // Enable scissor to clip scrollable content ONLY
+        int scissorTop = HEADER_HEIGHT;
+        int scissorBottom = this.height - FOOTER_HEIGHT;
+        context.enableScissor(0, scissorTop, this.width, scissorBottom);
+        
+        // Render ONLY scrollable widgets (not footer buttons)
+        for (WidgetEntry entry : scrollableWidgets) {
+            entry.widget.extractRenderState(context, mouseX, mouseY, delta);
+        }
+        
+        // Disable scissor
+        context.disableScissor();
+        
+        // Render footer buttons OUTSIDE scissor (so they're not clipped)
+        for (AbstractWidget button : footerButtons) {
+            button.extractRenderState(context, mouseX, mouseY, delta);
+        }
+        
+        // Draw scrollbar if needed
+        if (maxScrollOffset > 0) {
+            int scrollbarX = this.width - SCROLLBAR_WIDTH - 4;
+            int trackHeight = scissorBottom - scissorTop;
+            int thumbHeight = Math.max(20, trackHeight * trackHeight / (maxScrollOffset + trackHeight));
+            int thumbY = scissorTop + (int)((trackHeight - thumbHeight) * ((float)scrollOffset / maxScrollOffset));
+            
+            // Track background
+            context.fill(scrollbarX, scissorTop, scrollbarX + SCROLLBAR_WIDTH, scissorBottom, 0x40FFFFFF);
+            // Thumb
+            context.fill(scrollbarX, thumbY, scrollbarX + SCROLLBAR_WIDTH, thumbY + thumbHeight, 0xFFAAAAAA);
+        }
+        
+        // Draw scroll indicators
+        if (scrollOffset > 0) {
+            context.centeredText(this.font, Component.literal("▲"), this.width / 2, scissorTop + 2, 0xAAAAAA);
+        }
+        if (scrollOffset < maxScrollOffset) {
+            context.centeredText(this.font, Component.literal("▼"), this.width / 2, scissorBottom - 12, 0xAAAAAA);
+        }
+        
+        // Draw tooltips LAST (after scissor disabled, so they render on top)
+        if (mouseY > HEADER_HEIGHT && mouseY < this.height - FOOTER_HEIGHT) {
+            for (TooltipEntry entry : tooltips) {
+                int adjustedY = entry.y - scrollOffset;
+                if (mouseX >= entry.x && mouseX < entry.x + entry.width &&
+                    mouseY >= adjustedY && mouseY < adjustedY + 20) {
+                    context.setTooltipForNextFrame(this.font, Component.literal(entry.tooltip), mouseX, mouseY);
+                    break;
+                }
+            }
+        }
+    }
+    //?} else {
+    /*@Override
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         // Dark background
         context.fill(0, 0, this.width, this.height, 0xC0101010);
         
         // Title in header area (fixed)
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xFFFFFF);
+        context.drawCenteredString(this.font, this.title, this.width / 2, 12, 0xFFFFFF);
         
         // Enable scissor to clip scrollable content ONLY
         int scissorTop = HEADER_HEIGHT;
@@ -611,7 +658,7 @@ public class SimpleLootConfigScreen extends Screen {
         context.disableScissor();
         
         // Render footer buttons OUTSIDE scissor (so they're not clipped)
-        for (ClickableWidget button : footerButtons) {
+        for (AbstractWidget button : footerButtons) {
             button.render(context, mouseX, mouseY, delta);
         }
         
@@ -630,33 +677,33 @@ public class SimpleLootConfigScreen extends Screen {
         
         // Draw scroll indicators
         if (scrollOffset > 0) {
-            context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("▲"), this.width / 2, scissorTop + 2, 0xAAAAAA);
+            context.drawCenteredString(this.font, Component.literal("▲"), this.width / 2, scissorTop + 2, 0xAAAAAA);
         }
         if (scrollOffset < maxScrollOffset) {
-            context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("▼"), this.width / 2, scissorBottom - 12, 0xAAAAAA);
+            context.drawCenteredString(this.font, Component.literal("▼"), this.width / 2, scissorBottom - 12, 0xAAAAAA);
         }
         
         // Draw tooltips LAST (after scissor disabled, so they render on top)
         if (mouseY > HEADER_HEIGHT && mouseY < this.height - FOOTER_HEIGHT) {
             for (TooltipEntry entry : tooltips) {
-                // Adjust tooltip Y for scroll
                 int adjustedY = entry.y - scrollOffset;
                 if (mouseX >= entry.x && mouseX < entry.x + entry.width &&
                     mouseY >= adjustedY && mouseY < adjustedY + 20) {
-                    context.drawTooltip(this.textRenderer, Text.literal(entry.tooltip), mouseX, mouseY);
+                    context.setTooltipForNextFrame(this.font, Component.literal(entry.tooltip), mouseX, mouseY);
                     break;
                 }
             }
         }
-    }
+    }*/
+    //?}
 
     @Override
-    public void close() {
-        this.client.setScreen(parent);
+    public void onClose() {
+        this.minecraft.setScreen(parent);
     }
     
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 }

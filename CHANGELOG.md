@@ -2,6 +2,33 @@
 
 All notable changes to SimpleLoot will be documented in this file.
 
+## [1.4.0] - 2026-03-25
+
+### Added
+- Minecraft 26.1 support
+- Java 25 toolchain support
+- Unobfuscated jar handling for MC 26.1 (no mappings required)
+
+### Changed
+- Updated Gradle wrapper to 9.4.1
+- Updated Fabric Loom to 1.15.5
+- Updated Fabric Loader to 0.18.4
+- Migrated from Yarn to Mojmap mappings across all versions
+- Adapted all source files with Stonecutter conditionals for 26.1 API changes:
+  - `ResourceLocation` → `Identifier` (1.21.11+)
+  - `KeyBindingHelper` → `KeyMappingHelper`
+  - `FabricCreativeInventoryScreen` → `FabricCreativeModeInventoryScreen`
+  - `handleInventoryMouseClick` → `handleContainerInput` with `ContainerInput`
+  - `getSelectedItemGroup` → `getSelectedTab`
+  - Mouse events now use `MouseButtonEvent`
+- Fixed mixin target: `findSlot` → `getHoveredSlot` (Yarn → Mojmap)
+- Cloth Config excluded for 26.1 (no compatible version available yet)
+
+### Technical
+- Multi-version support expanded to 1.21.9, 1.21.10, 1.21.11, 26.1
+
+---
+
 ## [1.3.1] - 2025-12-21
 
 ### Added

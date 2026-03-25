@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'fabric-loom' version '1.15.5'
     id 'maven-publish'
 }
 
@@ -9,6 +9,14 @@ group = project.maven_group
 base {
     archivesName = project.archives_base_name
 }
+
+def isUnobfuscated = stonecutter.current.version == "26.1"
+
+// When disableObfuscation=true, Loom doesn't register mod* configurations or remap tasks.
+// Use standard Gradle configurations for unobfuscated versions.
+def modImpl = isUnobfuscated ? "implementation" : "modImplementation"
+def modRunOnly = isUnobfuscated ? "runtimeOnly" : "modRuntimeOnly"
+def modCompOnly = isUnobfuscated ? "compileOnly" : "modCompileOnly"
 
 repositories {
     maven {
@@ -28,21 +36,33 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${stonecutter.current.version}"
-    mappings "net.fabricmc:yarn:${property('deps.yarn')}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${property('deps.fabric_loader')}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${property('deps.fabric_api')}"
-
-    // OPTIONAL - Cloth Config (compile only for release, runtime for dev testing)
-    modCompileOnly("me.shedaniel.cloth:cloth-config-fabric:${property('deps.cloth_config')}") {
-        exclude(group: "net.fabricmc.fabric-api")
+    if (!isUnobfuscated) {
+        mappings loom.officialMojangMappings()
     }
-    modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:${property('deps.cloth_config')}") {
-        exclude(group: "net.fabricmc.fabric-api")
+    add(modImpl, "net.fabricmc:fabric-loader:${property('deps.fabric_loader')}")
+    add(modImpl, "net.fabricmc.fabric-api:fabric-api:${property('deps.fabric_api')}")
+
+    // OPTIONAL - Cloth Config (only available for pre-26.1)
+    def clothConfigVersion = findProperty('deps.cloth_config')
+    if (clothConfigVersion != null) {
+        add(modCompOnly, dependencies.create("me.shedaniel.cloth:cloth-config-fabric:${clothConfigVersion}") {
+            exclude(group: "net.fabricmc.fabric-api")
+        })
+        add(modRunOnly, dependencies.create("me.shedaniel.cloth:cloth-config-fabric:${clothConfigVersion}") {
+            exclude(group: "net.fabricmc.fabric-api")
+        })
     }
 
-    // OPTIONAL - ModMenu (runtime only for dev testing, compile only for release)
-    modRuntimeOnly "com.terraformersmc:modmenu:${property('deps.modmenu')}"
-    modCompileOnly "com.terraformersmc:modmenu:${property('deps.modmenu')}"
+    // OPTIONAL - ModMenu
+    def modmenuVersion = findProperty('deps.modmenu')
+    if (modmenuVersion != null) {
+        add(modRunOnly, dependencies.create("com.terraformersmc:modmenu:${modmenuVersion}") {
+            transitive = false
+        })
+        add(modCompOnly, dependencies.create("com.terraformersmc:modmenu:${modmenuVersion}") {
+            transitive = false
+        })
+    }
 }
 
 processResources {
@@ -57,15 +77,17 @@ processResources {
     }
 }
 
+def javaVersion = isUnobfuscated ? JavaVersion.VERSION_25 : JavaVersion.VERSION_21
+
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = isUnobfuscated ? 25 : 21
 }
 
 java {
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
 }
 
 jar {
@@ -99,5 +121,10 @@ if (!isChiseledBuild) {
 
 // Handle duplicate resources
 tasks.withType(ProcessResources).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// Handle duplicate entries in source jar
+tasks.withType(Jar).configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

@@ -3,20 +3,28 @@ package com.simpleloot.loot;
 import com.simpleloot.SimpleLootClient;
 import com.simpleloot.config.SimpleLootConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.*;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.EquippableComponent;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+//? if >=26.1 {
+import net.fabricmc.fabric.api.client.creativetab.v1.FabricCreativeModeInventoryScreen;
+//?} else {
+/*import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;*/
+//?}
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.*;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.equipment.Equippable;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.inventory.Slot;
+//? if >=26.1 {
+import net.minecraft.world.inventory.ContainerInput;
+//?} else {
+/*import net.minecraft.world.inventory.ClickType;*/
+//?}
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -37,6 +45,17 @@ import java.util.Set;
  */
 public class HoverLootHandler {
     
+    // Version-aware constants for container input types
+    //? if >=26.1 {
+    private static final ContainerInput SLOT_PICKUP = ContainerInput.PICKUP;
+    private static final ContainerInput SLOT_QUICK_MOVE = ContainerInput.QUICK_MOVE;
+    private static final ContainerInput SLOT_THROW = ContainerInput.THROW;
+    //?} else {
+    /*private static final ClickType SLOT_PICKUP = ClickType.PICKUP;
+    private static final ClickType SLOT_QUICK_MOVE = ClickType.QUICK_MOVE;
+    private static final ClickType SLOT_THROW = ClickType.THROW;*/
+    //?}
+    
     // Track which slots are currently in the pending queue
     // This prevents adding the same slot multiple times during one key-hold session
     private static final Set<Integer> currentlyQueued = new HashSet<>();
@@ -50,7 +69,7 @@ public class HoverLootHandler {
     private static final Queue<Integer> creativePendingSlotIds = new LinkedList<>();
     
     // Track the last screen we were in
-    private static HandledScreen<?> lastScreen = null;
+    private static AbstractContainerScreen<?> lastScreen = null;
     
     // Track last mouse position for interpolation
     private static double lastMouseX = -1;
@@ -75,8 +94,8 @@ public class HoverLootHandler {
     public static void init() {
         // Use client tick events to check for hover loot every tick
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.currentScreen instanceof HandledScreen<?> handledScreen) {
-                if (isSupportedScreen(client.currentScreen)) {
+            if (client.screen instanceof AbstractContainerScreen<?> handledScreen) {
+                if (isSupportedScreen(client.screen)) {
                     // Reset state if screen changed (new container opened)
                     if (lastScreen != handledScreen) {
                         currentlyQueued.clear();
@@ -92,8 +111,8 @@ public class HoverLootHandler {
                     }
                     
                     // Get current mouse position
-                    double mouseX = client.mouse.getX() * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
-                    double mouseY = client.mouse.getY() * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
+                    double mouseX = client.mouseHandler.xpos() * client.getWindow().getGuiScaledWidth() / client.getWindow().getWidth();
+                    double mouseY = client.mouseHandler.ypos() * client.getWindow().getGuiScaledHeight() / client.getWindow().getHeight();
                     
                     handleHoverLoot(client, handledScreen, mouseX, mouseY);
                     
@@ -124,11 +143,11 @@ public class HoverLootHandler {
      * Supports:
      * - All container types (chests, barrels, etc.)
      * - InventoryScreen for crafting grid transfers and drop mode
-     * - CreativeInventoryScreen for drop mode
+     * - CreativeModeInventoryScreen for drop mode
      * - CraftingScreen (crafting table) for crafting grid transfers
      */
-    private static boolean isSupportedScreen(net.minecraft.client.gui.screen.Screen screen) {
-        if (!(screen instanceof HandledScreen<?>)) {
+    private static boolean isSupportedScreen(net.minecraft.client.gui.screens.Screen screen) {
+        if (!(screen instanceof AbstractContainerScreen<?>)) {
             return false;
         }
         
@@ -139,8 +158,8 @@ public class HoverLootHandler {
             return config.allowHoverDrop || config.allowCraftingGrid;
         }
         
-        // CreativeInventoryScreen - only for drop mode
-        if (screen instanceof CreativeInventoryScreen) {
+        // CreativeModeInventoryScreen - only for drop mode
+        if (screen instanceof CreativeModeInventoryScreen) {
             return config.allowHoverDrop;
         }
         
@@ -150,9 +169,9 @@ public class HoverLootHandler {
         }
         
         // Check each container type against config
-        if (screen instanceof GenericContainerScreen) {
-            GenericContainerScreen containerScreen = (GenericContainerScreen) screen;
-            int rows = containerScreen.getScreenHandler().getRows();
+        if (screen instanceof ContainerScreen) {
+            ContainerScreen containerScreen = (ContainerScreen) screen;
+            int rows = containerScreen.getMenu().getRowCount();
             // Single chest = 3 rows, Double chest = 6 rows
             if (rows <= 3 && !config.allowChests) return false;
             if (rows > 3 && !config.allowDoubleChests) return false;
@@ -163,7 +182,7 @@ public class HoverLootHandler {
             return config.allowShulkerBoxes;
         }
         
-        if (screen instanceof Generic3x3ContainerScreen) {
+        if (screen instanceof DispenserScreen) {
             // This handles dispensers and droppers
             return config.allowDispensers || config.allowDroppers;
         }
@@ -226,10 +245,10 @@ public class HoverLootHandler {
             return config.allowCartographyTables;
         }
         
-        // Ender chest uses GenericContainerScreen, but we can check by title or other means
-        // For now, GenericContainerScreen covers ender chests as well
+        // Ender chest uses ContainerScreen, but we can check by title or other means
+        // For now, ContainerScreen covers ender chests as well
         
-        // Barrel also uses GenericContainerScreen (3 rows)
+        // Barrel also uses ContainerScreen (3 rows)
         
         return false;
     }
@@ -249,7 +268,7 @@ public class HoverLootHandler {
      * - Shift + hover: Quick move in inventory/crafting screens
      * - Crafting grid: Send items to/from crafting grid slots
      */
-    private static void handleHoverLoot(MinecraftClient client, HandledScreen<?> screen, double mouseX, double mouseY) {
+    private static void handleHoverLoot(Minecraft client, AbstractContainerScreen<?> screen, double mouseX, double mouseY) {
         SimpleLootConfig config = SimpleLootConfig.getInstance();
         boolean DEBUG = config.debugMode;
         
@@ -273,7 +292,7 @@ public class HoverLootHandler {
         
         // Check modifier keys
         boolean hoverDropKeyHeld = SimpleLootClient.isHoverDropKeyHeld();
-        long windowHandle = client.getWindow().getHandle();
+        long windowHandle = client.getWindow().handle();
         boolean ctrlHeld = GLFW.glfwGetKey(windowHandle, GLFW.GLFW_KEY_LEFT_CONTROL) == GLFW.GLFW_PRESS ||
                            GLFW.glfwGetKey(windowHandle, GLFW.GLFW_KEY_RIGHT_CONTROL) == GLFW.GLFW_PRESS;
         boolean shiftHeld = GLFW.glfwGetKey(windowHandle, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS ||
@@ -299,20 +318,25 @@ public class HoverLootHandler {
         
         // Determine screen type and allowed operations
         boolean isInventoryScreen = screen instanceof InventoryScreen;
-        boolean isCreativeInventory = screen instanceof CreativeInventoryScreen;
+        boolean isCreativeInventory = screen instanceof CreativeModeInventoryScreen;
         
         // Check if creative inventory is on the survival inventory tab (the only tab where drop should work)
         boolean isCreativeSurvivalTab = false;
         if (isCreativeInventory) {
-            CreativeInventoryScreen creativeScreen = (CreativeInventoryScreen) screen;
+            CreativeModeInventoryScreen creativeScreen = (CreativeModeInventoryScreen) screen;
             // Use Fabric API to get the currently selected item group
-            // The survival inventory tab is identified by getting its registry key and comparing to ItemGroups.INVENTORY
-            if (creativeScreen instanceof FabricCreativeInventoryScreen fabricScreen) {
-                ItemGroup selectedGroup = fabricScreen.getSelectedItemGroup();
+            // The survival inventory tab is identified by getting its registry key and comparing to CreativeModeTabs.INVENTORY
+            //? if >=26.1 {
+            if (creativeScreen instanceof FabricCreativeModeInventoryScreen fabricScreen) {
+                CreativeModeTab selectedGroup = fabricScreen.getSelectedTab();
+            //?} else {
+            /*if (creativeScreen instanceof FabricCreativeInventoryScreen fabricScreen) {
+                CreativeModeTab selectedGroup = fabricScreen.getSelectedItemGroup();*/
+            //?}
                 // Get the registry key of the selected group and compare to INVENTORY key
                 if (selectedGroup != null) {
-                    var selectedKey = Registries.ITEM_GROUP.getKey(selectedGroup);
-                    isCreativeSurvivalTab = selectedKey.isPresent() && selectedKey.get().equals(ItemGroups.INVENTORY);
+                    var selectedKey = BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(selectedGroup);
+                    isCreativeSurvivalTab = selectedKey.isPresent() && selectedKey.get().equals(CreativeModeTabs.INVENTORY);
                 }
                 
                 if (DEBUG && hoverLootActive) {
@@ -352,9 +376,9 @@ public class HoverLootHandler {
             List<Slot> slotsToQueue = getSlotsAlongPath(screen, lastMouseX, lastMouseY, mouseX, mouseY);
             
             for (Slot slot : slotsToQueue) {
-                if (slot != null && slot.hasStack()) {
+                if (slot != null && slot.hasItem()) {
                     // Check hotbar protection (only for non-crafting operations)
-                    if (config.hotbarProtection && !isCraftingSlot(screen, slot) && isHotbarSlot(screen.getScreenHandler(), slot)) {
+                    if (config.hotbarProtection && !isCraftingSlot(screen, slot) && isHotbarSlot(screen.getMenu(), slot)) {
                         continue;
                     }
                     
@@ -363,14 +387,14 @@ public class HoverLootHandler {
                     if (isCreativeInventory && isDropMode && isCreativeSurvivalTab) {
                         // Find the actual slot ID
                         int actualSlotId = findActualSlotId(screen, slot);
-                        if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Creative slot detection: slot.id={}, actualSlotId={}, item={}, alreadyQueued={}", 
-                                slot.id, actualSlotId, slot.getStack().getName().getString(), creativeQueuedSlotIds.contains(actualSlotId));
+                        if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Creative slot detection: slot.index={}, actualSlotId={}, item={}, alreadyQueued={}", 
+                                slot.index, actualSlotId, slot.getItem().getHoverName().getString(), creativeQueuedSlotIds.contains(actualSlotId));
                         if (actualSlotId >= 0 && !creativeQueuedSlotIds.contains(actualSlotId)) {
                             // Add to queue for processing
                             creativePendingSlotIds.add(actualSlotId);
                             creativeQueuedSlotIds.add(actualSlotId);
                             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Queued creative survival slot actualId={} with item: {}", 
-                                    actualSlotId, slot.getStack().getName().getString());
+                                    actualSlotId, slot.getItem().getHoverName().getString());
                         }
                     } else if (isCreativeInventory) {
                         // Non-survival tab creative - queue for later (though this shouldn't happen due to earlier checks)
@@ -379,16 +403,16 @@ public class HoverLootHandler {
                             creativePendingSlotIds.add(actualSlotId);
                             creativeQueuedSlotIds.add(actualSlotId);
                             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Queued creative slot actualId={} with item: {}", 
-                                    actualSlotId, slot.getStack().getName().getString());
+                                    actualSlotId, slot.getItem().getHoverName().getString());
                         }
                     } else {
-                        int slotId = slot.id;
+                        int slotId = slot.index;
                         // Add to queue if not already queued in THIS session
                         // (prevents adding same slot multiple times while active)
                         if (!currentlyQueued.contains(slotId)) {
                             // For armor equippable items, check if this slot was recently involved in an armor swap
                             // This prevents rapid re-swapping when the cursor stays on the same slot
-                            if (isEquippableArmor(slot.getStack())) {
+                            if (isEquippableArmor(slot.getItem())) {
                                 Long lastSwapTime = armorSwapTimes.get(slotId);
                                 if (lastSwapTime != null) {
                                     long timeSinceLastSwap = System.currentTimeMillis() - lastSwapTime;
@@ -402,16 +426,16 @@ public class HoverLootHandler {
                             }
                             
                             // Validate item for specific screen types
-                            if (!isValidSlotTransfer(screen, slot, slot.getStack(), isPlayerInventorySlotGeneric(screen, slot))) {
+                            if (!isValidSlotTransfer(screen, slot, slot.getItem(), isPlayerInventorySlotGeneric(screen, slot))) {
                                 if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Skipped slot {} - item {} not valid for this screen type", 
-                                        slotId, slot.getStack().getName().getString());
+                                        slotId, slot.getItem().getHoverName().getString());
                                 continue;
                             }
                             
                             pendingSlots.add(slotId);
                             currentlyQueued.add(slotId);
                             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Queued slot {} with item: {}", 
-                                    slotId, slot.getStack().getName().getString());
+                                    slotId, slot.getItem().getHoverName().getString());
                         }
                         // For armor: slot stays in currentlyQueued to prevent re-queueing until key is released
                         // This prevents rapid swapping when hovering over same slot after armor swap returns different armor
@@ -429,10 +453,10 @@ public class HoverLootHandler {
     
     /**
      * Finds the actual slot ID for a given slot in the screen handler.
-     * This is needed for creative inventory where slot.id is unreliable.
+     * This is needed for creative inventory where slot.index is unreliable.
      */
-    private static int findActualSlotId(HandledScreen<?> screen, Slot slot) {
-        var slots = screen.getScreenHandler().slots;
+    private static int findActualSlotId(AbstractContainerScreen<?> screen, Slot slot) {
+        var slots = screen.getMenu().slots;
         for (int i = 0; i < slots.size(); i++) {
             if (slots.get(i) == slot) {
                 return i;
@@ -444,9 +468,9 @@ public class HoverLootHandler {
     /**
      * Checks if a slot is in the player's hotbar.
      */
-    private static boolean isHotbarSlot(net.minecraft.screen.ScreenHandler handler, Slot slot) {
+    private static boolean isHotbarSlot(net.minecraft.world.inventory.AbstractContainerMenu handler, Slot slot) {
         int containerSlotCount = handler.slots.size() - 36;
-        int playerSlotIndex = slot.id - containerSlotCount;
+        int playerSlotIndex = slot.index - containerSlotCount;
         // Hotbar is the last 9 slots of player inventory (indices 27-35)
         return playerSlotIndex >= 27 && playerSlotIndex < 36;
     }
@@ -454,14 +478,14 @@ public class HoverLootHandler {
     /**
      * Checks if a slot is a crafting input slot (2x2 in inventory, 3x3 in crafting table).
      */
-    private static boolean isCraftingSlot(HandledScreen<?> screen, Slot slot) {
+    private static boolean isCraftingSlot(AbstractContainerScreen<?> screen, Slot slot) {
         if (screen instanceof InventoryScreen) {
             // Player inventory crafting grid: slots 1-4 (slot 0 is output)
-            return slot.id >= 1 && slot.id <= 4;
+            return slot.index >= 1 && slot.index <= 4;
         }
         if (screen instanceof CraftingScreen) {
             // Crafting table: slots 1-9 (slot 0 is output)
-            return slot.id >= 1 && slot.id <= 9;
+            return slot.index >= 1 && slot.index <= 9;
         }
         return false;
     }
@@ -469,10 +493,10 @@ public class HoverLootHandler {
     /**
      * Checks if a slot is the crafting output slot.
      */
-    private static boolean isCraftingOutputSlot(HandledScreen<?> screen, Slot slot) {
+    private static boolean isCraftingOutputSlot(AbstractContainerScreen<?> screen, Slot slot) {
         if (screen instanceof InventoryScreen || screen instanceof CraftingScreen) {
             // Output is always slot 0 in crafting screens
-            return slot.id == 0;
+            return slot.index == 0;
         }
         return false;
     }
@@ -481,8 +505,8 @@ public class HoverLootHandler {
      * Gets the first available crafting input slot index.
      * Returns -1 if all slots are full.
      */
-    private static int getAvailableCraftingSlot(HandledScreen<?> screen) {
-        var handler = screen.getScreenHandler();
+    private static int getAvailableCraftingSlot(AbstractContainerScreen<?> screen) {
+        var handler = screen.getMenu();
         int startSlot = 1; // Skip output slot
         int endSlot;
         
@@ -496,7 +520,7 @@ public class HoverLootHandler {
         
         for (int i = startSlot; i <= endSlot; i++) {
             Slot slot = handler.slots.get(i);
-            if (!slot.hasStack()) {
+            if (!slot.hasItem()) {
                 return i;
             }
         }
@@ -507,15 +531,15 @@ public class HoverLootHandler {
      * Checks if a slot is a player inventory slot (not crafting, not armor, not offhand).
      * In player inventory screen, main inventory is slots 9-35 (excluding armor 5-8 and offhand 45).
      */
-    private static boolean isPlayerInventorySlot(HandledScreen<?> screen, Slot slot) {
+    private static boolean isPlayerInventorySlot(AbstractContainerScreen<?> screen, Slot slot) {
         if (screen instanceof InventoryScreen) {
             // Player inventory: main inventory is 9-35, hotbar would be 36-44 but in this screen
             // Layout: 0=output, 1-4=crafting, 5-8=armor, 9-35=main inventory, 36-44=hotbar, 45=offhand
-            return slot.id >= 9 && slot.id <= 44;
+            return slot.index >= 9 && slot.index <= 44;
         }
         if (screen instanceof CraftingScreen) {
             // Crafting table: 0=output, 1-9=crafting grid, 10-36=main inventory, 37-45=hotbar
-            return slot.id >= 10 && slot.id <= 45;
+            return slot.index >= 10 && slot.index <= 45;
         }
         return false;
     }
@@ -524,7 +548,7 @@ public class HoverLootHandler {
      * Gets all slots along the mouse path from last position to current position.
      * This catches slots we might have "skipped over" when moving fast.
      */
-    private static List<Slot> getSlotsAlongPath(HandledScreen<?> screen, double fromX, double fromY, double toX, double toY) {
+    private static List<Slot> getSlotsAlongPath(AbstractContainerScreen<?> screen, double fromX, double fromY, double toX, double toY) {
         List<Slot> slots = new ArrayList<>();
         boolean DEBUG = SimpleLootConfig.getInstance().debugMode;
         
@@ -560,8 +584,8 @@ public class HoverLootHandler {
             Slot slot = getSlotAt(screen, x, y);
             if (slot != null) {
                 // For creative inventory, use actualSlotId for deduplication to match queue logic
-                int slotIdForDedup = slot.id;
-                if (screen instanceof CreativeInventoryScreen) {
+                int slotIdForDedup = slot.index;
+                if (screen instanceof CreativeModeInventoryScreen) {
                     int actualId = findActualSlotId(screen, slot);
                     if (actualId >= 0) {
                         slotIdForDedup = actualId;
@@ -571,9 +595,9 @@ public class HoverLootHandler {
                 if (!foundSlotIds.contains(slotIdForDedup)) {
                     slots.add(slot);
                     foundSlotIds.add(slotIdForDedup);
-                    if (DEBUG && screen instanceof CreativeInventoryScreen) {
-                        SimpleLootClient.LOGGER.info("[DEBUG] Path found slot: slot.id={}, actualId={}, hasStack={}, item={}", 
-                                slot.id, slotIdForDedup, slot.hasStack(), slot.hasStack() ? slot.getStack().getName().getString() : "empty");
+                    if (DEBUG && screen instanceof CreativeModeInventoryScreen) {
+                        SimpleLootClient.LOGGER.info("[DEBUG] Path found slot: slot.index={}, actualId={}, hasStack={}, item={}", 
+                                slot.index, slotIdForDedup, slot.hasItem(), slot.hasItem() ? slot.getItem().getHoverName().getString() : "empty");
                     }
                 }
             }
@@ -592,7 +616,7 @@ public class HoverLootHandler {
      * - Crafting mode: Send items to/from crafting grid
      * - Normal mode: Quick move items between containers
      */
-    private static void processQueue(MinecraftClient client, HandledScreen<?> screen, SimpleLootConfig config, boolean DEBUG) {
+    private static void processQueue(Minecraft client, AbstractContainerScreen<?> screen, SimpleLootConfig config, boolean DEBUG) {
         long currentTime = System.currentTimeMillis();
         
         // Check if we need to wait for the delay
@@ -605,7 +629,7 @@ public class HoverLootHandler {
         
         // Determine screen type for specialized handling
         boolean isInventoryScreen = screen instanceof InventoryScreen;
-        boolean isCreativeInventory = screen instanceof CreativeInventoryScreen;
+        boolean isCreativeInventory = screen instanceof CreativeModeInventoryScreen;
         boolean isCraftingTable = screen instanceof CraftingScreen;
         boolean hasCraftingGrid = isInventoryScreen || isCraftingTable;
         
@@ -624,12 +648,12 @@ public class HoverLootHandler {
                     // Find the slot at this ID
                     Slot slotToTransfer = findSlotById(screen, actualSlotId);
                     
-                    if (slotToTransfer != null && slotToTransfer.hasStack()) {
+                    if (slotToTransfer != null && slotToTransfer.hasItem()) {
                         if (isDropMode) {
                             // Drop mode: Drop items on ground using the actual slot ID
-                            performThrowById(client, screen, actualSlotId, slotToTransfer.getStack());
+                            performThrowById(client, screen, actualSlotId, slotToTransfer.getItem());
                             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Dropped creative slot actualId={} with item: {}", 
-                                    actualSlotId, slotToTransfer.getStack().getName().getString());
+                                    actualSlotId, slotToTransfer.getItem().getHoverName().getString());
                         }
                         // Creative mode only supports drop for now
                         
@@ -658,9 +682,9 @@ public class HoverLootHandler {
             // Find the slot by ID
             Slot slotToTransfer = findSlotById(screen, nextSlotId);
             
-            if (slotToTransfer != null && slotToTransfer.hasStack()) {
+            if (slotToTransfer != null && slotToTransfer.hasItem()) {
                 boolean handled = false;
-                ItemStack stack = slotToTransfer.getStack();
+                ItemStack stack = slotToTransfer.getItem();
                 
                 // Determine the action to perform
                 if (isDropMode) {
@@ -687,20 +711,20 @@ public class HoverLootHandler {
                             int targetArmorSlotId = getArmorSlotId(armorType);
                             Slot targetArmorSlot = findSlotById(screen, targetArmorSlotId);
                             
-                            if (targetArmorSlot != null && targetArmorSlot.hasStack()) {
+                            if (targetArmorSlot != null && targetArmorSlot.hasItem()) {
                                 // Armor slot has something - need to SWAP
                                 // Use pickup on source, then pickup on target (swaps), then pickup to place back
                                 performArmorSwap(client, screen, slotToTransfer, targetArmorSlot);
                                 handled = true;
                                 armorSwapTimes.put(nextSlotId, System.currentTimeMillis()); // Track swap time for this slot
                                 if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Swapped armor from slot {} to slot {}: {}", 
-                                        nextSlotId, targetArmorSlotId, stack.getName().getString());
+                                        nextSlotId, targetArmorSlotId, stack.getHoverName().getString());
                             } else {
                                 // Armor slot is empty - use quick move (shift-click) to equip
                                 performQuickMove(client, screen, slotToTransfer);
                                 handled = true;
                                 armorSwapTimes.put(nextSlotId, System.currentTimeMillis()); // Track swap time for this slot
-                                if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Equipped armor from slot {}: {}", nextSlotId, stack.getName().getString());
+                                if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Equipped armor from slot {}: {}", nextSlotId, stack.getHoverName().getString());
                             }
                         }
                     } else if (isArmorSlot(screen, slotToTransfer)) {
@@ -708,7 +732,7 @@ public class HoverLootHandler {
                         performQuickMove(client, screen, slotToTransfer);
                         handled = true;
                         armorSwapTimes.put(nextSlotId, System.currentTimeMillis()); // Track swap time for this armor slot
-                        if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Unequipped armor from slot {}: {}", nextSlotId, stack.getName().getString());
+                        if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Unequipped armor from slot {}: {}", nextSlotId, stack.getHoverName().getString());
                     }
                 } else if (hasCraftingGrid && config.allowCraftingGrid) {
                     // Crafting grid handling
@@ -780,7 +804,7 @@ public class HoverLootHandler {
         if (stack.isEmpty()) return false;
         
         // Check for equippable component (1.21+ method)
-        EquippableComponent equippable = stack.get(DataComponentTypes.EQUIPPABLE);
+        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
         if (equippable != null) {
             EquipmentSlot slot = equippable.slot();
             // Only armor slots (HEAD, CHEST, LEGS, FEET), not MAINHAND or OFFHAND
@@ -797,7 +821,7 @@ public class HoverLootHandler {
     private static EquipmentSlot getArmorSlotType(ItemStack stack) {
         if (stack.isEmpty()) return null;
         
-        EquippableComponent equippable = stack.get(DataComponentTypes.EQUIPPABLE);
+        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
         if (equippable != null) {
             EquipmentSlot slot = equippable.slot();
             if (slot == EquipmentSlot.HEAD || slot == EquipmentSlot.CHEST || 
@@ -826,9 +850,9 @@ public class HoverLootHandler {
      * Checks if a slot is an armor slot in the inventory screen.
      * In InventoryScreen: slots 5-8 are armor (5=helmet, 6=chest, 7=legs, 8=boots)
      */
-    private static boolean isArmorSlot(HandledScreen<?> screen, Slot slot) {
+    private static boolean isArmorSlot(AbstractContainerScreen<?> screen, Slot slot) {
         if (screen instanceof InventoryScreen) {
-            return slot.id >= 5 && slot.id <= 8;
+            return slot.index >= 5 && slot.index <= 8;
         }
         return false;
     }
@@ -836,8 +860,8 @@ public class HoverLootHandler {
     /**
      * Finds a slot by its ID in the screen handler.
      */
-    private static Slot findSlotById(HandledScreen<?> screen, int slotId) {
-        var slots = screen.getScreenHandler().slots;
+    private static Slot findSlotById(AbstractContainerScreen<?> screen, int slotId) {
+        var slots = screen.getMenu().slots;
         if (slotId >= 0 && slotId < slots.size()) {
             return slots.get(slotId);
         }
@@ -846,11 +870,29 @@ public class HoverLootHandler {
     
     /**
      * Gets the slot at the given screen coordinates.
-     * Uses the HandledScreen's slot detection.
+     * Uses the AbstractContainerScreen's slot detection.
      */
-    private static Slot getSlotAt(HandledScreen<?> screen, double mouseX, double mouseY) {
+    private static Slot getSlotAt(AbstractContainerScreen<?> screen, double mouseX, double mouseY) {
         // Access the slot at coordinates through the HandledScreenAccessor mixin
         return HandledScreenAccessor.getSlotAt(screen, mouseX, mouseY);
+    }
+    
+    /**
+     * Version-aware wrapper for container slot interaction.
+     * In 26.1+, the method was renamed and ClickType became ContainerInput.
+     */
+    private static void containerInput(MultiPlayerGameMode gameMode, int containerId, int slotId, int button,
+            //? if >=26.1 {
+            ContainerInput action,
+            //?} else {
+            /*ClickType action,*/
+            //?}
+            net.minecraft.world.entity.player.Player player) {
+        //? if >=26.1 {
+        gameMode.handleContainerInput(containerId, slotId, button, action, player);
+        //?} else {
+        /*gameMode.handleInventoryMouseClick(containerId, slotId, button, action, player);*/
+        //?}
     }
     
     /**
@@ -859,29 +901,29 @@ public class HoverLootHandler {
      * - Container slot → Player inventory
      * - Player inventory slot → Container
      */
-    private static void performQuickMove(MinecraftClient client, HandledScreen<?> screen, Slot slot) {
+    private static void performQuickMove(Minecraft client, AbstractContainerScreen<?> screen, Slot slot) {
         boolean DEBUG = SimpleLootConfig.getInstance().debugMode;
         
-        if (client.interactionManager == null || client.player == null) {
+        if (client.gameMode == null || client.player == null) {
             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] interactionManager or player is null");
             return;
         }
         
-        ClientPlayerInteractionManager interactionManager = client.interactionManager;
+        MultiPlayerGameMode interactionManager = client.gameMode;
         
         if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Performing QUICK_MOVE on slot {} with item {}", 
-                slot.id, slot.getStack().getName().getString());
+                slot.index, slot.getItem().getHoverName().getString());
         
         // Perform shift-click (quick move) on the slot
-        interactionManager.clickSlot(
-                screen.getScreenHandler().syncId,
-                slot.id,
+        containerInput(interactionManager,
+                screen.getMenu().containerId,
+                slot.index,
                 0, // Button (0 = left click)
-                SlotActionType.QUICK_MOVE,
+                SLOT_QUICK_MOVE,
                 client.player
         );
         
-        SimpleLootClient.LOGGER.debug("Quick-moved item from slot {}", slot.id);
+        SimpleLootClient.LOGGER.debug("Quick-moved item from slot {}", slot.index);
     }
     
     /**
@@ -889,87 +931,87 @@ public class HoverLootHandler {
      * This picks up the inventory armor, clicks on the armor slot (which swaps), 
      * then places the old armor back in the inventory.
      */
-    private static void performArmorSwap(MinecraftClient client, HandledScreen<?> screen, Slot sourceSlot, Slot armorSlot) {
+    private static void performArmorSwap(Minecraft client, AbstractContainerScreen<?> screen, Slot sourceSlot, Slot armorSlot) {
         boolean DEBUG = SimpleLootConfig.getInstance().debugMode;
         
-        if (client.interactionManager == null || client.player == null) {
+        if (client.gameMode == null || client.player == null) {
             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] interactionManager or player is null");
             return;
         }
         
-        ClientPlayerInteractionManager interactionManager = client.interactionManager;
-        int syncId = screen.getScreenHandler().syncId;
+        MultiPlayerGameMode interactionManager = client.gameMode;
+        int syncId = screen.getMenu().containerId;
         
         if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Performing armor swap: inventory slot {} <-> armor slot {}", 
-                sourceSlot.id, armorSlot.id);
+                sourceSlot.index, armorSlot.index);
         
         // Step 1: Pick up the armor from inventory slot (left-click)
-        interactionManager.clickSlot(
+        containerInput(interactionManager,
                 syncId,
-                sourceSlot.id,
+                sourceSlot.index,
                 0, // Button (0 = left click = pick up)
-                SlotActionType.PICKUP,
+                SLOT_PICKUP,
                 client.player
         );
         
         // Step 2: Click on the armor slot - this will swap the held item with the worn armor
-        interactionManager.clickSlot(
+        containerInput(interactionManager,
                 syncId,
-                armorSlot.id,
+                armorSlot.index,
                 0, // Button (0 = left click = swap/place)
-                SlotActionType.PICKUP,
+                SLOT_PICKUP,
                 client.player
         );
         
         // Step 3: Put the old armor back into the original inventory slot
-        interactionManager.clickSlot(
+        containerInput(interactionManager,
                 syncId,
-                sourceSlot.id,
+                sourceSlot.index,
                 0, // Button (0 = left click = place)
-                SlotActionType.PICKUP,
+                SLOT_PICKUP,
                 client.player
         );
         
-        SimpleLootClient.LOGGER.debug("Swapped armor between slot {} and armor slot {}", sourceSlot.id, armorSlot.id);
+        SimpleLootClient.LOGGER.debug("Swapped armor between slot {} and armor slot {}", sourceSlot.index, armorSlot.index);
     }
     
     /**
      * Performs a transfer from a player inventory slot to a specific crafting grid slot.
      * This picks up the item and places it in the target crafting slot.
      */
-    private static void performCraftingTransfer(MinecraftClient client, HandledScreen<?> screen, Slot sourceSlot, int targetSlotId) {
+    private static void performCraftingTransfer(Minecraft client, AbstractContainerScreen<?> screen, Slot sourceSlot, int targetSlotId) {
         boolean DEBUG = SimpleLootConfig.getInstance().debugMode;
         
-        if (client.interactionManager == null || client.player == null) {
+        if (client.gameMode == null || client.player == null) {
             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] interactionManager or player is null");
             return;
         }
         
-        ClientPlayerInteractionManager interactionManager = client.interactionManager;
-        int syncId = screen.getScreenHandler().syncId;
+        MultiPlayerGameMode interactionManager = client.gameMode;
+        int syncId = screen.getMenu().containerId;
         
         if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Performing crafting transfer: slot {} -> crafting slot {}", 
-                sourceSlot.id, targetSlotId);
+                sourceSlot.index, targetSlotId);
         
         // Step 1: Pick up the entire stack from the source slot (left-click)
-        interactionManager.clickSlot(
+        containerInput(interactionManager,
                 syncId,
-                sourceSlot.id,
+                sourceSlot.index,
                 0, // Button (0 = left click = pick up full stack)
-                SlotActionType.PICKUP,
+                SLOT_PICKUP,
                 client.player
         );
         
         // Step 2: Place the stack in the target crafting slot
-        interactionManager.clickSlot(
+        containerInput(interactionManager,
                 syncId,
                 targetSlotId,
                 0, // Button (0 = left click = place all held items)
-                SlotActionType.PICKUP,
+                SLOT_PICKUP,
                 client.player
         );
         
-        SimpleLootClient.LOGGER.debug("Transferred item to crafting slot {} from slot {}", targetSlotId, sourceSlot.id);
+        SimpleLootClient.LOGGER.debug("Transferred item to crafting slot {} from slot {}", targetSlotId, sourceSlot.index);
     }
     
     /**
@@ -977,26 +1019,26 @@ public class HoverLootHandler {
      * This drops the entire stack on the ground.
      * Works in both survival and creative mode.
      */
-    private static void performThrow(MinecraftClient client, HandledScreen<?> screen, Slot slot) {
+    private static void performThrow(Minecraft client, AbstractContainerScreen<?> screen, Slot slot) {
         boolean DEBUG = SimpleLootConfig.getInstance().debugMode;
         
-        if (client.interactionManager == null || client.player == null) {
+        if (client.gameMode == null || client.player == null) {
             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] interactionManager or player is null");
             return;
         }
         
-        ClientPlayerInteractionManager interactionManager = client.interactionManager;
+        MultiPlayerGameMode interactionManager = client.gameMode;
         
-        // Creative mode inventory (CreativeInventoryScreen) needs special handling
+        // Creative mode inventory (CreativeModeInventoryScreen) needs special handling
         // Regular containers in creative mode work with normal THROW
-        boolean isCreativeInventory = screen instanceof CreativeInventoryScreen;
+        boolean isCreativeInventory = screen instanceof CreativeModeInventoryScreen;
         
-        // For creative inventory, slot.id is unreliable (always 0).
+        // For creative inventory, slot.index is unreliable (always 0).
         // We need to find the slot's actual index in the screen handler.
-        int actualSlotId = slot.id;
+        int actualSlotId = slot.index;
         if (isCreativeInventory) {
             // Search for this slot in the screen handler's slot list
-            var slots = screen.getScreenHandler().slots;
+            var slots = screen.getMenu().slots;
             for (int i = 0; i < slots.size(); i++) {
                 if (slots.get(i) == slot) {
                     actualSlotId = i;
@@ -1006,37 +1048,37 @@ public class HoverLootHandler {
         }
         
         if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Performing THROW on slot {} (actualId={}) with item {}, creative={}, isCreativeInventory={}, screenClass={}", 
-                slot.id, actualSlotId, slot.getStack().getName().getString(), client.player.isCreative(), isCreativeInventory, screen.getClass().getSimpleName());
+                slot.index, actualSlotId, slot.getItem().getHoverName().getString(), client.player.isCreative(), isCreativeInventory, screen.getClass().getSimpleName());
         
         if (isCreativeInventory) {
             // In creative inventory, we need to pick up and drop outside
             // The creative inventory uses a special screen handler
             // Step 1: Pick up the entire stack (left click)
-            interactionManager.clickSlot(
-                    screen.getScreenHandler().syncId,
+            containerInput(interactionManager,
+                    screen.getMenu().containerId,
                     actualSlotId,
                     0, // Button (0 = left click to pick up)
-                    SlotActionType.PICKUP,
+                    SLOT_PICKUP,
                     client.player
             );
             
             // Step 2: Click outside the inventory to drop (-999 is the "outside" slot)
-            interactionManager.clickSlot(
-                    screen.getScreenHandler().syncId,
+            containerInput(interactionManager,
+                    screen.getMenu().containerId,
                     -999, // -999 = click outside inventory = drop held item
                     0, // Button (0 = left click to drop all)
-                    SlotActionType.PICKUP,
+                    SLOT_PICKUP,
                     client.player
             );
             
             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Used PICKUP method for creative inventory (actualSlotId={})", actualSlotId);
         } else {
             // For all other screens (including containers in creative mode), use THROW
-            interactionManager.clickSlot(
-                    screen.getScreenHandler().syncId,
+            containerInput(interactionManager,
+                    screen.getMenu().containerId,
                     actualSlotId,
                     1, // Button (1 = Ctrl modifier for THROW action = throw entire stack)
-                    SlotActionType.THROW,
+                    SLOT_THROW,
                     client.player
             );
             
@@ -1050,35 +1092,35 @@ public class HoverLootHandler {
      * Performs a throw using a pre-computed slot ID.
      * Used for creative inventory where we've already computed the actual slot ID.
      */
-    private static void performThrowById(MinecraftClient client, HandledScreen<?> screen, int actualSlotId, ItemStack stack) {
+    private static void performThrowById(Minecraft client, AbstractContainerScreen<?> screen, int actualSlotId, ItemStack stack) {
         boolean DEBUG = SimpleLootConfig.getInstance().debugMode;
         
-        if (client.interactionManager == null || client.player == null) {
+        if (client.gameMode == null || client.player == null) {
             if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] interactionManager or player is null");
             return;
         }
         
-        ClientPlayerInteractionManager interactionManager = client.interactionManager;
+        MultiPlayerGameMode interactionManager = client.gameMode;
         
         if (DEBUG) SimpleLootClient.LOGGER.info("[DEBUG] Performing THROW by ID on actualSlotId={} with item {}", 
-                actualSlotId, stack.getName().getString());
+                actualSlotId, stack.getHoverName().getString());
         
         // In creative inventory, we need to pick up and drop outside
         // Step 1: Pick up the entire stack (left click)
-        interactionManager.clickSlot(
-                screen.getScreenHandler().syncId,
+        containerInput(interactionManager,
+                screen.getMenu().containerId,
                 actualSlotId,
                 0, // Button (0 = left click to pick up)
-                SlotActionType.PICKUP,
+                SLOT_PICKUP,
                 client.player
         );
         
         // Step 2: Click outside the inventory to drop (-999 is the "outside" slot)
-        interactionManager.clickSlot(
-                screen.getScreenHandler().syncId,
+        containerInput(interactionManager,
+                screen.getMenu().containerId,
                 -999, // -999 = click outside inventory = drop held item
                 0, // Button (0 = left click to drop all)
-                SlotActionType.PICKUP,
+                SLOT_PICKUP,
                 client.player
         );
         
@@ -1089,16 +1131,16 @@ public class HoverLootHandler {
      * Checks if a slot is a player inventory slot in any screen type.
      * This is a generic check that works for all container screens.
      */
-    private static boolean isPlayerInventorySlotGeneric(HandledScreen<?> screen, Slot slot) {
+    private static boolean isPlayerInventorySlotGeneric(AbstractContainerScreen<?> screen, Slot slot) {
         // Most container screens have the player inventory in the last 36 slots
         // The container slots come first, then player inventory (27 main + 9 hotbar)
-        var handler = screen.getScreenHandler();
+        var handler = screen.getMenu();
         int totalSlots = handler.slots.size();
         
         // Player inventory is typically the last 36 slots
         // Slot IDs: totalSlots - 36 to totalSlots - 1
         int playerInvStart = totalSlots - 36;
-        return slot.id >= playerInvStart;
+        return slot.index >= playerInvStart;
     }
     
     /**
@@ -1126,7 +1168,7 @@ public class HoverLootHandler {
         if (stack.isEmpty()) return false;
         
         // Check if item is a book (can become enchanted book)
-        if (stack.isOf(Items.BOOK)) {
+        if (stack.is(Items.BOOK)) {
             return true;
         }
         
@@ -1137,12 +1179,12 @@ public class HoverLootHandler {
         
         // Check for enchantable component (some items may be enchantable without durability)
         // This handles edge cases like fishing rods, flint and steel, shears, etc.
-        if (stack.contains(DataComponentTypes.ENCHANTABLE)) {
+        if (stack.has(DataComponents.ENCHANTABLE)) {
             return true;
         }
         
         // Check for items that can already have enchantments
-        if (stack.contains(DataComponentTypes.ENCHANTMENTS)) {
+        if (stack.has(DataComponents.ENCHANTMENTS)) {
             return true;
         }
         
@@ -1159,7 +1201,7 @@ public class HoverLootHandler {
      * @param isFromPlayerInventory True if the slot is in player inventory (transferring TO container)
      * @return True if the transfer should be allowed
      */
-    private static boolean isValidSlotTransfer(HandledScreen<?> screen, Slot slot, ItemStack stack, boolean isFromPlayerInventory) {
+    private static boolean isValidSlotTransfer(AbstractContainerScreen<?> screen, Slot slot, ItemStack stack, boolean isFromPlayerInventory) {
         // For furnace-type screens, all transfers are allowed
         // Minecraft's quick-move handles putting items in the correct slots automatically
         if (screen instanceof FurnaceScreen || screen instanceof BlastFurnaceScreen || screen instanceof SmokerScreen) {
@@ -1172,7 +1214,7 @@ public class HoverLootHandler {
             if (isFromPlayerInventory) {
                 // Transferring FROM player inventory TO enchanting table
                 // Only allow enchantable items or lapis lazuli
-                if (!isEnchantableItem(stack) && !stack.isOf(Items.LAPIS_LAZULI)) {
+                if (!isEnchantableItem(stack) && !stack.is(Items.LAPIS_LAZULI)) {
                     return false;
                 }
             }
@@ -1200,11 +1242,11 @@ public class HoverLootHandler {
      */
     private static boolean isBeaconPaymentItem(ItemStack stack) {
         if (stack.isEmpty()) return false;
-        return stack.isOf(Items.IRON_INGOT) || 
-               stack.isOf(Items.GOLD_INGOT) || 
-               stack.isOf(Items.EMERALD) || 
-               stack.isOf(Items.DIAMOND) || 
-               stack.isOf(Items.NETHERITE_INGOT);
+        return stack.is(Items.IRON_INGOT) || 
+               stack.is(Items.GOLD_INGOT) || 
+               stack.is(Items.EMERALD) || 
+               stack.is(Items.DIAMOND) || 
+               stack.is(Items.NETHERITE_INGOT);
     }
     
     /**

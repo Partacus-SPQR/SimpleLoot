@@ -1,267 +1,262 @@
 package com.simpleloot.config;
 
-import com.simpleloot.SimpleLootClient;
+//? if <26.1 {
+/*import com.simpleloot.SimpleLootClient;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
-/**
- * Configuration screen for SimpleLoot using Cloth Config API.
- */
+// Configuration screen for SimpleLoot using Cloth Config API.
+// Only available for pre-26.1 versions where Cloth Config exists.
 public class ModConfigScreen {
     
-    /**
-     * Creates the configuration screen for SimpleLoot.
-     * 
-     * @param parent The parent screen to return to when closing
-     * @return The configuration screen
-     */
     public static Screen createConfigScreen(Screen parent) {
         SimpleLootConfig config = SimpleLootConfig.getInstance();
         
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
-                .setTitle(Text.translatable("config.simpleloot.title"))
+                .setTitle(Component.translatable("config.simpleloot.title"))
                 .setSavingRunnable(config::save);
         
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         
         // General Settings Category
         ConfigCategory general = builder.getOrCreateCategory(
-                Text.translatable("config.simpleloot.category.general"));
+                Component.translatable("config.simpleloot.category.general"));
         
         general.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.enabled"), config.enabled)
+                .startBooleanToggle(Component.translatable("config.simpleloot.enabled"), config.enabled)
                 .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.simpleloot.enabled.tooltip"))
+                .setTooltip(Component.translatable("config.simpleloot.enabled.tooltip"))
                 .setSaveConsumer(value -> config.enabled = value)
                 .build());
         
         general.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.hotbarProtection"), config.hotbarProtection)
+                .startBooleanToggle(Component.translatable("config.simpleloot.hotbarProtection"), config.hotbarProtection)
                 .setDefaultValue(false)
-                .setTooltip(Text.translatable("config.simpleloot.hotbarProtection.tooltip"))
+                .setTooltip(Component.translatable("config.simpleloot.hotbarProtection.tooltip"))
                 .setSaveConsumer(value -> config.hotbarProtection = value)
                 .build());
         
         general.addEntry(entryBuilder
-                .startIntField(Text.translatable("config.simpleloot.transferDelayMs"), config.transferDelayMs)
+                .startIntField(Component.translatable("config.simpleloot.transferDelayMs"), config.transferDelayMs)
                 .setDefaultValue(20)
                 .setMin(0)
                 .setMax(500)
-                .setTooltip(Text.translatable("config.simpleloot.transferDelayMs.tooltip"))
+                .setTooltip(Component.translatable("config.simpleloot.transferDelayMs.tooltip"))
                 .setSaveConsumer(value -> config.transferDelayMs = value)
                 .build());
         
         general.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.debugMode"), config.debugMode)
+                .startBooleanToggle(Component.translatable("config.simpleloot.debugMode"), config.debugMode)
                 .setDefaultValue(false)
-                .setTooltip(Text.translatable("config.simpleloot.debugMode.tooltip"))
+                .setTooltip(Component.translatable("config.simpleloot.debugMode.tooltip"))
                 .setSaveConsumer(value -> config.debugMode = value)
                 .build());
         
         general.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowHoverDrop"), config.allowHoverDrop)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowHoverDrop"), config.allowHoverDrop)
                 .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.simpleloot.allowHoverDrop.tooltip"))
+                .setTooltip(Component.translatable("config.simpleloot.allowHoverDrop.tooltip"))
                 .setSaveConsumer(value -> config.allowHoverDrop = value)
                 .build());
         
         general.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowCraftingGrid"), config.allowCraftingGrid)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowCraftingGrid"), config.allowCraftingGrid)
                 .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.simpleloot.allowCraftingGrid.tooltip"))
+                .setTooltip(Component.translatable("config.simpleloot.allowCraftingGrid.tooltip"))
                 .setSaveConsumer(value -> config.allowCraftingGrid = value)
                 .build());
         
         general.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowArmorEquip"), config.allowArmorEquip)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowArmorEquip"), config.allowArmorEquip)
                 .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.simpleloot.allowArmorEquip.tooltip"))
+                .setTooltip(Component.translatable("config.simpleloot.allowArmorEquip.tooltip"))
                 .setSaveConsumer(value -> config.allowArmorEquip = value)
                 .build());
         
         general.addEntry(entryBuilder
-                .startIntField(Text.translatable("config.simpleloot.armorSwapDelayMs"), config.armorSwapDelayMs)
+                .startIntField(Component.translatable("config.simpleloot.armorSwapDelayMs"), config.armorSwapDelayMs)
                 .setDefaultValue(70)
                 .setMin(0)
                 .setMax(500)
-                .setTooltip(Text.translatable("config.simpleloot.armorSwapDelayMs.tooltip"))
+                .setTooltip(Component.translatable("config.simpleloot.armorSwapDelayMs.tooltip"))
                 .setSaveConsumer(value -> config.armorSwapDelayMs = value)
                 .build());
         
         // Container Settings Category
         ConfigCategory containers = builder.getOrCreateCategory(
-                Text.translatable("config.simpleloot.category.containers"));
+                Component.translatable("config.simpleloot.category.containers"));
         
-        // Storage containers
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowChests"), config.allowChests)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowChests"), config.allowChests)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowChests = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowDoubleChests"), config.allowDoubleChests)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowDoubleChests"), config.allowDoubleChests)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowDoubleChests = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowBarrels"), config.allowBarrels)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowBarrels"), config.allowBarrels)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowBarrels = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowShulkerBoxes"), config.allowShulkerBoxes)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowShulkerBoxes"), config.allowShulkerBoxes)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowShulkerBoxes = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowEnderChests"), config.allowEnderChests)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowEnderChests"), config.allowEnderChests)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowEnderChests = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowDispensers"), config.allowDispensers)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowDispensers"), config.allowDispensers)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowDispensers = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowDroppers"), config.allowDroppers)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowDroppers"), config.allowDroppers)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowDroppers = value)
                 .build());
         
         containers.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowHoppers"), config.allowHoppers)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowHoppers"), config.allowHoppers)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowHoppers = value)
                 .build());
         
         // Processing Category
         ConfigCategory processing = builder.getOrCreateCategory(
-                Text.translatable("config.simpleloot.category.processing"));
+                Component.translatable("config.simpleloot.category.processing"));
         
         processing.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowFurnaces"), config.allowFurnaces)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowFurnaces"), config.allowFurnaces)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowFurnaces = value)
                 .build());
         
         processing.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowBlastFurnaces"), config.allowBlastFurnaces)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowBlastFurnaces"), config.allowBlastFurnaces)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowBlastFurnaces = value)
                 .build());
         
         processing.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowSmokers"), config.allowSmokers)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowSmokers"), config.allowSmokers)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowSmokers = value)
                 .build());
         
         processing.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowBrewingStands"), config.allowBrewingStands)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowBrewingStands"), config.allowBrewingStands)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowBrewingStands = value)
                 .build());
         
         // Workstations Category
         ConfigCategory workstations = builder.getOrCreateCategory(
-                Text.translatable("config.simpleloot.category.workstations"));
+                Component.translatable("config.simpleloot.category.workstations"));
         
         workstations.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowAnvils"), config.allowAnvils)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowAnvils"), config.allowAnvils)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowAnvils = value)
                 .build());
         
         workstations.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowSmithingTables"), config.allowSmithingTables)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowSmithingTables"), config.allowSmithingTables)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowSmithingTables = value)
                 .build());
         
         workstations.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowGrindstones"), config.allowGrindstones)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowGrindstones"), config.allowGrindstones)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowGrindstones = value)
                 .build());
         
         workstations.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowStonecutters"), config.allowStonecutters)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowStonecutters"), config.allowStonecutters)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowStonecutters = value)
                 .build());
         
         workstations.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowLooms"), config.allowLooms)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowLooms"), config.allowLooms)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowLooms = value)
                 .build());
         
         workstations.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowEnchantingTables"), config.allowEnchantingTables)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowEnchantingTables"), config.allowEnchantingTables)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowEnchantingTables = value)
                 .build());
         
         workstations.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowBeacons"), config.allowBeacons)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowBeacons"), config.allowBeacons)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowBeacons = value)
                 .build());
         
         workstations.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowCrafters"), config.allowCrafters)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowCrafters"), config.allowCrafters)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowCrafters = value)
                 .build());
         
         workstations.addEntry(entryBuilder
-                .startBooleanToggle(Text.translatable("config.simpleloot.allowCartographyTables"), config.allowCartographyTables)
+                .startBooleanToggle(Component.translatable("config.simpleloot.allowCartographyTables"), config.allowCartographyTables)
                 .setDefaultValue(true)
                 .setSaveConsumer(value -> config.allowCartographyTables = value)
                 .build());
         
         // Keybindings Category
         ConfigCategory keybinds = builder.getOrCreateCategory(
-                Text.translatable("config.simpleloot.category.keybinds"));
+                Component.translatable("config.simpleloot.category.keybinds"));
         
-        // Add instruction text for keybinds
         keybinds.addEntry(entryBuilder.startTextDescription(
-                Text.literal("Note: ").formatted(Formatting.GOLD)
-                        .append(Text.literal("Keybinds set here are also accessible in Options > Controls > Key Binds.").formatted(Formatting.WHITE)))
+                Component.literal("Note: ").withStyle(ChatFormatting.GOLD)
+                        .append(Component.literal("Keybinds set here are also accessible in Options > Controls > Key Binds.").withStyle(ChatFormatting.WHITE)))
                 .build());
         
         keybinds.addEntry(entryBuilder.fillKeybindingField(
-                Text.translatable("key.simpleloot.hover_loot"),
+                Component.translatable("key.simpleloot.hover_loot"),
                 SimpleLootClient.hoverLootKeyBinding)
                 .build());
         
         keybinds.addEntry(entryBuilder.fillKeybindingField(
-                Text.translatable("key.simpleloot.hover_drop"),
+                Component.translatable("key.simpleloot.hover_drop"),
                 SimpleLootClient.hoverDropKeyBinding)
                 .build());
         
         keybinds.addEntry(entryBuilder.fillKeybindingField(
-                Text.translatable("key.simpleloot.toggle"),
+                Component.translatable("key.simpleloot.toggle"),
                 SimpleLootClient.toggleKeyBinding)
                 .build());
         
         keybinds.addEntry(entryBuilder.fillKeybindingField(
-                Text.translatable("key.simpleloot.config"),
+                Component.translatable("key.simpleloot.config"),
                 SimpleLootClient.configKeyBinding)
                 .build());
         
         return builder.build();
     }
-}
+}*/
+//?} else {
+public class ModConfigScreen {}
+//?}

@@ -1,16 +1,27 @@
 package com.simpleloot;
 
-import com.simpleloot.config.ModConfigScreen;
+//? if <26.1 {
+/*import com.simpleloot.config.ModConfigScreen;*/
+//?}
 import com.simpleloot.config.SimpleLootConfig;
 import com.simpleloot.config.SimpleLootConfigScreen;
 import com.simpleloot.loot.HoverLootHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+//? if >=26.1 {
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+//?} else {
+/*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;*/
+//?}
+//? if >=1.21.11 {
+import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +38,20 @@ public class SimpleLootClient implements ClientModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("SimpleLoot");
 
     // Keybinding category
-    private static final KeyBinding.Category KEYBIND_CATEGORY = new KeyBinding.Category(
-            Identifier.of(MOD_ID, "category")
+    private static final KeyMapping.Category KEYBIND_CATEGORY = new KeyMapping.Category(
+            //? if >=1.21.11 {
+            Identifier.fromNamespaceAndPath(MOD_ID, "category")
+            //?} else {
+            /*ResourceLocation.fromNamespaceAndPath(MOD_ID, "category")*/
+            //?}
     );
 
     // Keybindings - all unbound by default to prevent conflicts
-    public static KeyBinding hoverLootKeyBinding;  // Hold to hover loot
-    public static KeyBinding hoverDropKeyBinding;  // Hold to hover drop (alternative to Ctrl+HoverLoot)
-    public static KeyBinding toggleKeyBinding;     // Enable/disable the mod
-    public static KeyBinding configKeyBinding;     // Open config screen
-    public static KeyBinding reloadConfigKeyBinding; // Reload config from file
+    public static KeyMapping hoverLootKeyBinding;  // Hold to hover loot
+    public static KeyMapping hoverDropKeyBinding;  // Hold to hover drop (alternative to Ctrl+HoverLoot)
+    public static KeyMapping toggleKeyBinding;     // Enable/disable the mod
+    public static KeyMapping configKeyBinding;     // Open config screen
+    public static KeyMapping reloadConfigKeyBinding; // Reload config from file
 
     @Override
     public void onInitializeClient() {
@@ -48,41 +63,61 @@ public class SimpleLootClient implements ClientModInitializer {
         // Register keybindings with no default key assigned
         
         // Main hover loot key - hold to transfer items you hover over
-        hoverLootKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        //? if >=26.1 {
+        hoverLootKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        //?} else {
+        /*hoverLootKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(*/
+        //?}
                 "key.simpleloot.hover_loot",
-                InputUtil.Type.KEYSYM,
+                InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_UNKNOWN,
                 KEYBIND_CATEGORY
         ));
 
         // Hover drop key - hold to drop items you hover over (alternative to Ctrl+HoverLoot)
-        hoverDropKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        //? if >=26.1 {
+        hoverDropKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        //?} else {
+        /*hoverDropKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(*/
+        //?}
                 "key.simpleloot.hover_drop",
-                InputUtil.Type.KEYSYM,
+                InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_UNKNOWN,
                 KEYBIND_CATEGORY
         ));
 
         // Enable/Disable the mod entirely
-        toggleKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        //? if >=26.1 {
+        toggleKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        //?} else {
+        /*toggleKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(*/
+        //?}
                 "key.simpleloot.toggle",
-                InputUtil.Type.KEYSYM,
+                InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_UNKNOWN,
                 KEYBIND_CATEGORY
         ));
 
         // Open config screen
-        configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        //? if >=26.1 {
+        configKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        //?} else {
+        /*configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(*/
+        //?}
                 "key.simpleloot.config",
-                InputUtil.Type.KEYSYM,
+                InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_UNKNOWN,
                 KEYBIND_CATEGORY
         ));
 
         // Reload config from file
-        reloadConfigKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        //? if >=26.1 {
+        reloadConfigKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        //?} else {
+        /*reloadConfigKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(*/
+        //?}
                 "key.simpleloot.reload_config",
-                InputUtil.Type.KEYSYM,
+                InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_UNKNOWN,
                 KEYBIND_CATEGORY
         ));
@@ -99,32 +134,38 @@ public class SimpleLootClient implements ClientModInitializer {
     /**
      * Handles all keybind processing each tick.
      */
-    private void handleKeybinds(MinecraftClient client) {
+    private void handleKeybinds(Minecraft client) {
         SimpleLootConfig config = SimpleLootConfig.getInstance();
         
         // Handle enable/disable mod keybind
-        while (toggleKeyBinding.wasPressed()) {
+        while (toggleKeyBinding.consumeClick()) {
             config.enabled = !config.enabled;
             config.save();
             LOGGER.info("SimpleLoot {}", config.enabled ? "enabled" : "disabled");
         }
         
         // Handle config keybind (only when no screen is open)
-        while (configKeyBinding.wasPressed()) {
-            if (client.currentScreen == null) {
+        while (configKeyBinding.consumeClick()) {
+            if (client.screen == null) {
                 client.setScreen(createConfigScreen());
             }
         }
         
         // Handle reload config keybind
-        while (reloadConfigKeyBinding.wasPressed()) {
+        while (reloadConfigKeyBinding.consumeClick()) {
             SimpleLootConfig.reload();
             LOGGER.info("SimpleLoot config reloaded from file");
             if (client.player != null) {
-                client.player.sendMessage(
-                    net.minecraft.text.Text.literal("SimpleLoot config reloaded"),
-                    true
+                //? if >=26.1 {
+                client.player.sendOverlayMessage(
+                    Component.literal("SimpleLoot config reloaded")
                 );
+                //?} else {
+                /*client.player.displayClientMessage(
+                    Component.literal("SimpleLoot config reloaded"),
+                    true
+                );*/
+                //?}
             }
         }
     }
@@ -132,44 +173,40 @@ public class SimpleLootClient implements ClientModInitializer {
     /**
      * Creates the config screen, trying Cloth Config first with fallback.
      */
-    private static net.minecraft.client.gui.screen.Screen createConfigScreen() {
-        try {
+    private static net.minecraft.client.gui.screens.Screen createConfigScreen() {
+        //? if <26.1 {
+        /*try {
             return ModConfigScreen.createConfigScreen(null);
         } catch (Throwable e) {
             LOGGER.warn("Cloth Config unavailable, using fallback config screen");
-            return new SimpleLootConfigScreen(null);
-        }
+        }*/
+        //?}
+        return new SimpleLootConfigScreen(null);
     }
     
     /**
      * Checks if the hover loot key is currently being held down.
-     * 
-     * @return true if the hover loot key is currently pressed
      */
     public static boolean isHoverLootKeyHeld() {
-        MinecraftClient client = MinecraftClient.getInstance();
+        Minecraft client = Minecraft.getInstance();
         if (client == null || client.getWindow() == null) {
             return false;
         }
         
-        // Get the bound key code from the keybinding
-        InputUtil.Key boundKey = InputUtil.fromTranslationKey(hoverLootKeyBinding.getBoundKeyTranslationKey());
+        InputConstants.Key boundKey = InputConstants.getKey(hoverLootKeyBinding.saveString());
         
-        // If the key is unbound (UNKNOWN), return false
-        if (boundKey.equals(InputUtil.UNKNOWN_KEY)) {
+        if (boundKey.equals(InputConstants.UNKNOWN)) {
             return false;
         }
         
-        long windowHandle = client.getWindow().getHandle();
+        long windowHandle = client.getWindow().handle();
         
-        // For keyboard keys, check if the key is currently pressed
-        if (boundKey.getCategory() == InputUtil.Type.KEYSYM) {
-            return GLFW.glfwGetKey(windowHandle, boundKey.getCode()) == GLFW.GLFW_PRESS;
+        if (boundKey.getType() == InputConstants.Type.KEYSYM) {
+            return GLFW.glfwGetKey(windowHandle, boundKey.getValue()) == GLFW.GLFW_PRESS;
         }
         
-        // For mouse buttons, check if the button is pressed
-        if (boundKey.getCategory() == InputUtil.Type.MOUSE) {
-            return GLFW.glfwGetMouseButton(windowHandle, boundKey.getCode()) == GLFW.GLFW_PRESS;
+        if (boundKey.getType() == InputConstants.Type.MOUSE) {
+            return GLFW.glfwGetMouseButton(windowHandle, boundKey.getValue()) == GLFW.GLFW_PRESS;
         }
         
         return false;
@@ -187,33 +224,27 @@ public class SimpleLootClient implements ClientModInitializer {
     
     /**
      * Checks if the hover drop key is currently being held down.
-     * 
-     * @return true if the hover drop key is currently pressed
      */
     public static boolean isHoverDropKeyHeld() {
-        MinecraftClient client = MinecraftClient.getInstance();
+        Minecraft client = Minecraft.getInstance();
         if (client == null || client.getWindow() == null) {
             return false;
         }
         
-        // Get the bound key code from the keybinding
-        InputUtil.Key boundKey = InputUtil.fromTranslationKey(hoverDropKeyBinding.getBoundKeyTranslationKey());
+        InputConstants.Key boundKey = InputConstants.getKey(hoverDropKeyBinding.saveString());
         
-        // If the key is unbound (UNKNOWN), return false
-        if (boundKey.equals(InputUtil.UNKNOWN_KEY)) {
+        if (boundKey.equals(InputConstants.UNKNOWN)) {
             return false;
         }
         
-        long windowHandle = client.getWindow().getHandle();
+        long windowHandle = client.getWindow().handle();
         
-        // For keyboard keys, check if the key is currently pressed
-        if (boundKey.getCategory() == InputUtil.Type.KEYSYM) {
-            return GLFW.glfwGetKey(windowHandle, boundKey.getCode()) == GLFW.GLFW_PRESS;
+        if (boundKey.getType() == InputConstants.Type.KEYSYM) {
+            return GLFW.glfwGetKey(windowHandle, boundKey.getValue()) == GLFW.GLFW_PRESS;
         }
         
-        // For mouse buttons, check if the button is pressed
-        if (boundKey.getCategory() == InputUtil.Type.MOUSE) {
-            return GLFW.glfwGetMouseButton(windowHandle, boundKey.getCode()) == GLFW.GLFW_PRESS;
+        if (boundKey.getType() == InputConstants.Type.MOUSE) {
+            return GLFW.glfwGetMouseButton(windowHandle, boundKey.getValue()) == GLFW.GLFW_PRESS;
         }
         
         return false;
@@ -222,7 +253,13 @@ public class SimpleLootClient implements ClientModInitializer {
     /**
      * Creates a Minecraft Identifier for this mod.
      */
+    //? if >=1.21.11 {
     public static Identifier id(String path) {
-        return Identifier.of(MOD_ID, path);
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
+    //?} else {
+    /*public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    }*/
+    //?}
 }
