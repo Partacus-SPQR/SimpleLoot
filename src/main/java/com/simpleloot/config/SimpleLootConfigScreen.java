@@ -12,6 +12,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
+import com.simpleloot.compat.ScreenCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -321,21 +322,21 @@ public class SimpleLootConfigScreen extends Screen {
         Button saveBtn = Button.builder(Component.literal("Save & Close"), button -> {
             transferDelayMs = transferDelaySlider.getIntValue();
             saveConfig();
-            this.minecraft.setScreen(parent);
+            ScreenCompat.open(this.minecraft, parent);
         }).bounds(bottomStartX, bottomY, bottomButtonWidth, 20).build();
         this.addRenderableWidget(saveBtn);
         footerButtons.add(saveBtn);
         
         // Keybinds button
         Button keybindsBtn = Button.builder(Component.translatable("controls.keybinds"), button -> {
-            this.minecraft.setScreen(new KeyBindsScreen(this, this.minecraft.options));
+            ScreenCompat.open(this.minecraft, new KeyBindsScreen(this, this.minecraft.options));
         }).bounds(bottomStartX + bottomButtonWidth + 4, bottomY, bottomButtonWidth, 20).build();
         this.addRenderableWidget(keybindsBtn);
         footerButtons.add(keybindsBtn);
         
         // Cancel button
         Button cancelBtn = Button.builder(Component.translatable("gui.cancel"), button -> {
-            this.minecraft.setScreen(parent);
+            ScreenCompat.open(this.minecraft, parent);
         }).bounds(bottomStartX + bottomButtonWidth * 2 + 8, bottomY, bottomButtonWidth, 20).build();
         this.addRenderableWidget(cancelBtn);
         footerButtons.add(cancelBtn);
@@ -699,7 +700,7 @@ public class SimpleLootConfigScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(parent);
+        ScreenCompat.open(this.minecraft, parent);
     }
     
     @Override

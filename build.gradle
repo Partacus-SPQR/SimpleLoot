@@ -10,7 +10,7 @@ base {
     archivesName = project.archives_base_name
 }
 
-def isUnobfuscated = stonecutter.current.version == "26.1"
+def isUnobfuscated = stonecutter.current.version.startsWith("26.")
 
 // When disableObfuscation=true, Loom doesn't register mod* configurations or remap tasks.
 // Use standard Gradle configurations for unobfuscated versions.
@@ -77,7 +77,7 @@ processResources {
     }
 }
 
-def javaVersion = isUnobfuscated ? JavaVersion.VERSION_25 : JavaVersion.VERSION_21
+def javaVersion = isUnobfuscated ? 25 : 21
 
 tasks.withType(JavaCompile).configureEach {
     it.options.release = isUnobfuscated ? 25 : 21
@@ -86,8 +86,9 @@ tasks.withType(JavaCompile).configureEach {
 java {
     withSourcesJar()
 
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(javaVersion)
+    }
 }
 
 jar {

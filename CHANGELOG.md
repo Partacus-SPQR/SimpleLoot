@@ -2,6 +2,21 @@
 
 All notable changes to SimpleLoot will be documented in this file.
 
+## [1.5.0] - 2026-06-24
+
+### Added
+- Minecraft 26.2 support (unobfuscated builds, Java 25)
+
+### Changed
+- 26.2 is now the primary build target; multi-version builds cover 1.21.9, 1.21.10, 1.21.11, 26.1, and 26.2
+- Adapted to the 26.2 screen API change via a new `ScreenCompat` helper:
+  - `Minecraft.setScreen()` → `Minecraft.setScreenAndShow()`
+  - `Minecraft.screen` field → `Minecraft.gui.screen()`
+- Switched the Java config to a toolchain so the 26.x (Java 25) builds no longer depend on the ambient JDK
+- Updated dependencies for 26.2: Fabric API 0.153.0+26.2, Mod Menu 20.0.0-beta.4
+
+---
+
 ## [1.4.0] - 2026-03-25
 
 ### Added

@@ -1,9 +1,9 @@
 ﻿# SimpleLoot
 
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.9--26.1-green)](https://minecraft.net)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.9--26.2-green)](https://minecraft.net)
 [![Fabric](https://img.shields.io/badge/Mod%20Loader-Fabric-blue)](https://fabricmc.net)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.4.0-orange)](https://modrinth.com/mod/simpleloot)
+[![Version](https://img.shields.io/badge/Version-1.5.0-orange)](https://modrinth.com/mod/simpleloot)
 
 A lightweight Fabric mod for Minecraft that adds **Rust-style Hover Loot** - quickly transfer items by holding a key and swiping your mouse over slots.
 
@@ -83,14 +83,14 @@ All keybindings support both keyboard keys and mouse buttons.
 
 ## Requirements
 
-- Minecraft 1.21.9, 1.21.10, 1.21.11, or 26.1
+- Minecraft 1.21.9, 1.21.10, 1.21.11, 26.1, or 26.2
 - Fabric Loader 0.18.4+
 - Fabric API
-- Java 21 (for 1.21.9-1.21.11) or Java 25 (for 26.1)
+- Java 21 (for 1.21.9-1.21.11) or Java 25 (for 26.1/26.2)
 
 ### Optional (Recommended)
 
-- [Cloth Config](https://modrinth.com/mod/cloth-config) - Enhanced config screen (not available for MC 26.1 yet)
+- [Cloth Config](https://modrinth.com/mod/cloth-config) - Enhanced config screen (not available for MC 26.x yet)
 - [ModMenu](https://modrinth.com/mod/modmenu) - In-game mod configuration access
 
 > **Note:** SimpleLoot includes a full-featured fallback config screen with sliders, tooltips, reset buttons, and scrolling. This screen is used when Cloth Config is unavailable or incompatible with your Minecraft version.

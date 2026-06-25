@@ -20,6 +20,7 @@ import net.minecraft.resources.Identifier;
 //?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.KeyMapping;
+import com.simpleloot.compat.ScreenCompat;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
@@ -146,8 +147,8 @@ public class SimpleLootClient implements ClientModInitializer {
         
         // Handle config keybind (only when no screen is open)
         while (configKeyBinding.consumeClick()) {
-            if (client.screen == null) {
-                client.setScreen(createConfigScreen());
+            if (ScreenCompat.current(client) == null) {
+                ScreenCompat.open(client, createConfigScreen());
             }
         }
         

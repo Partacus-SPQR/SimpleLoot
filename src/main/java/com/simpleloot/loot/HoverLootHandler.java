@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.creativetab.v1.FabricCreativeModeInventory
 /*import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;*/
 //?}
 import net.minecraft.client.Minecraft;
+import com.simpleloot.compat.ScreenCompat;
 import net.minecraft.client.gui.screens.inventory.*;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.component.DataComponents;
@@ -94,8 +95,8 @@ public class HoverLootHandler {
     public static void init() {
         // Use client tick events to check for hover loot every tick
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.screen instanceof AbstractContainerScreen<?> handledScreen) {
-                if (isSupportedScreen(client.screen)) {
+            if (ScreenCompat.current(client) instanceof AbstractContainerScreen<?> handledScreen) {
+                if (isSupportedScreen(ScreenCompat.current(client))) {
                     // Reset state if screen changed (new container opened)
                     if (lastScreen != handledScreen) {
                         currentlyQueued.clear();
