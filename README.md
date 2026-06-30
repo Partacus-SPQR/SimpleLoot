@@ -83,10 +83,10 @@ All keybindings support both keyboard keys and mouse buttons.
 
 ## Requirements
 
-- Minecraft 1.21.9, 1.21.10, 1.21.11, 26.1, or 26.2
+- Minecraft 1.21.9, 1.21.10, 1.21.11, 26.1, 26.1.2, or 26.2
 - Fabric Loader 0.18.4+
 - Fabric API
-- Java 21 (for 1.21.9-1.21.11) or Java 25 (for 26.1/26.2)
+- Java 21 (for 1.21.9-1.21.11) or Java 25 (for 26.1/26.1.2/26.2)
 
 ### Optional (Recommended)
 
